@@ -1,15 +1,6 @@
 
-/**
- * Auth component
- *
- * This component will contain the login and registration forms
- * for the Rekolta web application.
- *
- * Producers and restaurants will be able to register.
- * All users, including administrators, will be able to log in.
- */
-
 import { useState } from 'react'
+import type { FormEvent } from 'react'
 
 // Defines the available authentication views.
 type AuthMode = 'login' | 'register'
@@ -18,29 +9,63 @@ type AuthMode = 'login' | 'register'
 type UserRole = 'PRODUCER' | 'RESTAURANT'
 
 export default function Auth() {
-  // Controls which form is displayed.
   const [mode, setMode] = useState<AuthMode>('login')
-
-  // Stores the selected account type during registration.
   const [role, setRole] = useState<UserRole>('PRODUCER')
 
-  // Temporarily prevents form submission until the backend is connected.
-  const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [passwordError, setPasswordError] = useState('')
+
+  // Switches between login and registration forms.
+  const changeMode = (newMode: AuthMode) => {
+    setMode(newMode)
+    setPassword('')
+    setConfirmPassword('')
+    setPasswordError('')
+  }
+
+  // Validates password confirmation before backend integration.
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    if (mode === 'register' && password !== confirmPassword) {
+      setPasswordError('Passwords do not match.')
+      return
+    }
+
+    setPasswordError('')
+
+    // Backend authentication will be connected later.
   }
 
   return (
     <main className="auth-page">
       <section className="auth-card">
-        <h1>Rekolta</h1>
-        <p>Connecting local producers and restaurants</p>
+
+        {/* Application name - logo will be added later. */}
+        <h1 className="auth-title">Rekolta</h1>
+
+        <p className="auth-subtitle">
+          Connecting local producers and restaurants
+        </p>
 
         {/* Switch between login and registration forms. */}
         <div className="auth-tabs">
-          <button type="button" onClick={() => setMode('login')}>
+          <button
+            type="button"
+            className={mode === 'login' ? 'active' : ''}
+            onClick={() => changeMode('login')}
+            aria-pressed={mode === 'login'}
+          >
             Log In
           </button>
-          <button type="button" onClick={() => setMode('register')}>
+
+          <button
+            type="button"
+            className={mode === 'register' ? 'active' : ''}
+            onClick={() => changeMode('register')}
+            aria-pressed={mode === 'register'}
+          >
             Sign Up
           </button>
         </div>
@@ -62,44 +87,111 @@ export default function Auth() {
               </select>
 
               <label htmlFor="fullName">Full Name</label>
-              <input id="fullName" type="text" required />
+              <input
+                id="fullName"
+                type="text"
+                placeholder="Your full name"
+                autoComplete="name"
+                required
+              />
             </>
           )}
 
           {/* Fields shared by login and registration. */}
           <label htmlFor="email">Email</label>
-          <input id="email" type="email" required />
+          <input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            autoComplete="email"
+            required
+          />
 
           <label htmlFor="password">Password</label>
           <input
             id="password"
             type="password"
+            placeholder="Enter your password"
+            autoComplete={
+              mode === 'login' ? 'current-password' : 'new-password'
+            }
+            value={password}
+            onChange={(event) => {
+              setPassword(event.target.value)
+              setPasswordError('')
+            }}
             minLength={mode === 'register' ? 8 : undefined}
             required
           />
 
-          {/* Additional information required for registration. */}
+          {/* Confirm Password is only shown during registration. */}
           {mode === 'register' && (
             <>
+              <label htmlFor="confirmPassword">
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                placeholder="Re-enter your password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(event) => {
+                  setConfirmPassword(event.target.value)
+                  setPasswordError('')
+                }}
+                minLength={8}
+                required
+              />
+
+              {passwordError && (
+                <p className="auth-error" role="alert">
+                  {passwordError}
+                </p>
+              )}
+
               <label htmlFor="businessName">
                 {role === 'PRODUCER'
                   ? 'Farm or Business Name'
                   : 'Restaurant Name'}
               </label>
-              <input id="businessName" type="text" required />
+              <input
+                id="businessName"
+                type="text"
+                placeholder="Business name"
+                required
+              />
 
               <label htmlFor="phone">Phone Number</label>
-              <input id="phone" type="tel" required />
+              <input
+                id="phone"
+                type="tel"
+                placeholder="+359 ..."
+                autoComplete="tel"
+                required
+              />
 
               <label htmlFor="address">Address</label>
-              <input id="address" type="text" required />
+              <input
+                id="address"
+                type="text"
+                placeholder="Street address"
+                autoComplete="street-address"
+                required
+              />
 
               <label htmlFor="city">City</label>
-              <input id="city" type="text" required />
+              <input
+                id="city"
+                type="text"
+                placeholder="City"
+                autoComplete="address-level2"
+                required
+              />
             </>
           )}
 
-          <button type="submit">
+          <button type="submit" className="auth-submit">
             {mode === 'login' ? 'Log In' : 'Create Account'}
           </button>
         </form>
