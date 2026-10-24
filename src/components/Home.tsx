@@ -6,9 +6,9 @@ function Home() {
           <h1>Fresh, Local, Direct.</h1>
 
           <p>
-            Connecting Bulgarian farmers with
-            local restaurants.
-          </p>
+  Connecting local agricultural producers
+  with restaurants in Bulgaria.
+         </p>
 
           <button className="explore-btn">
             Explore Products
