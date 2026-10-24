@@ -1,13 +1,8 @@
-
-import Auth from './components/Auth'
+import Home from './components/Home'
 import './App.css'
 
-/**
- * Main application component.
- * Displays the Rekolta authentication page.
- */
 function App() {
-  return <Auth />
+  return <Home />
 }
 
 export default App
