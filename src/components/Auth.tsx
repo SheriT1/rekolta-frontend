@@ -1,10 +1,7 @@
 import { useState } from 'react'
 import type { SubmitEventHandler } from 'react'
 
-// Defines the available authentication views.
 type AuthMode = 'login' | 'register'
-
-// Only producers and restaurants can register publicly.
 type UserRole = 'PRODUCER' | 'RESTAURANT'
 
 export default function Auth() {
@@ -19,7 +16,7 @@ export default function Auth() {
   const [successMessage, setSuccessMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  // Switches between login and registration forms.
+  // Switch between Login and Registration.
   const changeMode = (newMode: AuthMode) => {
     if (isLoading) return
 
@@ -31,8 +28,8 @@ export default function Auth() {
     setSuccessMessage('')
   }
 
-  // Validates the form and sends registration data to NestJS.
- const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
+  // Send Login or Registration data to NestJS.
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault()
 
     if (isLoading) return
@@ -41,19 +38,64 @@ export default function Auth() {
     setServerError('')
     setSuccessMessage('')
 
-    // Login will be connected in a later step.
+    const form = event.currentTarget
+    const formData = new FormData(form)
+
+    // LOGIN
     if (mode === 'login') {
-      setServerError('Login is not available yet.')
+      const loginData = {
+        email: String(formData.get('email') ?? '').trim(),
+        password,
+      }
+
+      setIsLoading(true)
+
+      try {
+        const response = await fetch(
+          'http://localhost:3000/auth/login',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(loginData),
+          }
+        )
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null)
+          const message = errorData?.message
+
+          throw new Error(
+            Array.isArray(message)
+              ? message.join(', ')
+              : typeof message === 'string'
+                ? message
+                : 'Login failed. Please try again.'
+          )
+        }
+
+        setSuccessMessage('Credentials verified successfully!')
+        setPassword('')
+        form.reset()
+      } catch (error) {
+        setServerError(
+          error instanceof Error
+            ? error.message
+            : 'Unable to connect to the server.'
+        )
+      } finally {
+        setIsLoading(false)
+      }
+
       return
     }
 
+    // REGISTER
     if (password !== confirmPassword) {
       setPasswordError('Passwords do not match.')
       return
     }
-
-    const form = event.currentTarget
-    const formData = new FormData(form)
 
     const registrationData = {
       fullName: String(formData.get('fullName') ?? '').trim(),
@@ -82,7 +124,6 @@ export default function Auth() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null)
-
         const message = errorData?.message
 
         throw new Error(
@@ -205,7 +246,7 @@ export default function Auth() {
             disabled={isLoading}
           />
 
-          {/* Confirm Password is only shown during registration. */}
+          {/* Registration-only fields. */}
           {mode === 'register' && (
             <>
               <label htmlFor="confirmPassword">
@@ -303,7 +344,9 @@ export default function Auth() {
             disabled={isLoading}
           >
             {isLoading
-              ? 'Creating Account...'
+              ? mode === 'login'
+                ? 'Logging In...'
+                : 'Creating Account...'
               : mode === 'login'
                 ? 'Log In'
                 : 'Create Account'}
