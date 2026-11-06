@@ -1,6 +1,5 @@
-
 import { useState } from 'react'
-import type { FormEvent } from 'react'
+import type { SubmitEventHandler } from 'react'
 
 // Defines the available authentication views.
 type AuthMode = 'login' | 'register'
@@ -16,26 +15,98 @@ export default function Auth() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [passwordError, setPasswordError] = useState('')
 
+  const [serverError, setServerError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
   // Switches between login and registration forms.
   const changeMode = (newMode: AuthMode) => {
+    if (isLoading) return
+
     setMode(newMode)
     setPassword('')
     setConfirmPassword('')
     setPasswordError('')
+    setServerError('')
+    setSuccessMessage('')
   }
 
-  // Validates password confirmation before backend integration.
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  // Validates the form and sends registration data to NestJS.
+ const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault()
 
-    if (mode === 'register' && password !== confirmPassword) {
+    if (isLoading) return
+
+    setPasswordError('')
+    setServerError('')
+    setSuccessMessage('')
+
+    // Login will be connected in a later step.
+    if (mode === 'login') {
+      setServerError('Login is not available yet.')
+      return
+    }
+
+    if (password !== confirmPassword) {
       setPasswordError('Passwords do not match.')
       return
     }
 
-    setPasswordError('')
+    const form = event.currentTarget
+    const formData = new FormData(form)
 
-    // Backend authentication will be connected later.
+    const registrationData = {
+      fullName: String(formData.get('fullName') ?? '').trim(),
+      email: String(formData.get('email') ?? '').trim(),
+      password,
+      role,
+      businessName: String(formData.get('businessName') ?? '').trim(),
+      phone: String(formData.get('phone') ?? '').trim(),
+      address: String(formData.get('address') ?? '').trim(),
+      city: String(formData.get('city') ?? '').trim(),
+    }
+
+    setIsLoading(true)
+
+    try {
+      const response = await fetch(
+        'http://localhost:3000/auth/register',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(registrationData),
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null)
+
+        const message = errorData?.message
+
+        throw new Error(
+          Array.isArray(message)
+            ? message.join(', ')
+            : typeof message === 'string'
+              ? message
+              : 'Registration failed. Please try again.'
+        )
+      }
+
+      setSuccessMessage('Account created successfully!')
+      form.reset()
+      setPassword('')
+      setConfirmPassword('')
+    } catch (error) {
+      setServerError(
+        error instanceof Error
+          ? error.message
+          : 'Unable to connect to the server.'
+      )
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -56,6 +127,7 @@ export default function Auth() {
             className={mode === 'login' ? 'active' : ''}
             onClick={() => changeMode('login')}
             aria-pressed={mode === 'login'}
+            disabled={isLoading}
           >
             Log In
           </button>
@@ -65,6 +137,7 @@ export default function Auth() {
             className={mode === 'register' ? 'active' : ''}
             onClick={() => changeMode('register')}
             aria-pressed={mode === 'register'}
+            disabled={isLoading}
           >
             Sign Up
           </button>
@@ -81,6 +154,7 @@ export default function Auth() {
                 onChange={(event) =>
                   setRole(event.target.value as UserRole)
                 }
+                disabled={isLoading}
               >
                 <option value="PRODUCER">Producer</option>
                 <option value="RESTAURANT">Restaurant</option>
@@ -89,10 +163,13 @@ export default function Auth() {
               <label htmlFor="fullName">Full Name</label>
               <input
                 id="fullName"
+                name="fullName"
                 type="text"
                 placeholder="Your full name"
                 autoComplete="name"
+                maxLength={150}
                 required
+                disabled={isLoading}
               />
             </>
           )}
@@ -101,10 +178,13 @@ export default function Auth() {
           <label htmlFor="email">Email</label>
           <input
             id="email"
+            name="email"
             type="email"
             placeholder="you@example.com"
             autoComplete="email"
+            maxLength={255}
             required
+            disabled={isLoading}
           />
 
           <label htmlFor="password">Password</label>
@@ -122,6 +202,7 @@ export default function Auth() {
             }}
             minLength={mode === 'register' ? 8 : undefined}
             required
+            disabled={isLoading}
           />
 
           {/* Confirm Password is only shown during registration. */}
@@ -142,6 +223,7 @@ export default function Auth() {
                 }}
                 minLength={8}
                 required
+                disabled={isLoading}
               />
 
               {passwordError && (
@@ -157,42 +239,74 @@ export default function Auth() {
               </label>
               <input
                 id="businessName"
+                name="businessName"
                 type="text"
                 placeholder="Business name"
+                maxLength={200}
                 required
+                disabled={isLoading}
               />
 
               <label htmlFor="phone">Phone Number</label>
               <input
                 id="phone"
+                name="phone"
                 type="tel"
                 placeholder="+359 ..."
                 autoComplete="tel"
+                maxLength={30}
                 required
+                disabled={isLoading}
               />
 
               <label htmlFor="address">Address</label>
               <input
                 id="address"
+                name="address"
                 type="text"
                 placeholder="Street address"
                 autoComplete="street-address"
+                maxLength={255}
                 required
+                disabled={isLoading}
               />
 
               <label htmlFor="city">City</label>
               <input
                 id="city"
+                name="city"
                 type="text"
                 placeholder="City"
                 autoComplete="address-level2"
+                maxLength={100}
                 required
+                disabled={isLoading}
               />
             </>
           )}
 
-          <button type="submit" className="auth-submit">
-            {mode === 'login' ? 'Log In' : 'Create Account'}
+          {serverError && (
+            <p className="auth-error" role="alert">
+              {serverError}
+            </p>
+          )}
+
+          {successMessage && (
+            <p role="status">
+              {successMessage}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            className="auth-submit"
+            disabled={isLoading}
+          >
+            {isLoading
+              ? 'Creating Account...'
+              : mode === 'login'
+                ? 'Log In'
+                : 'Create Account'}
           </button>
         </form>
       </section>
