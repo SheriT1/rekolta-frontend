@@ -55,6 +55,7 @@ export default function Auth() {
           'http://localhost:3000/auth/login',
           {
             method: 'POST',
+            credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
             },
@@ -215,7 +216,7 @@ export default function Auth() {
             </>
           )}
 
-          {/* Fields shared by login and registration. */}
+          {/* Fields shared by Login and Registration. */}
           <label htmlFor="email">Email</label>
           <input
             id="email"
