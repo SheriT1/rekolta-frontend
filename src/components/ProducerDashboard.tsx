@@ -1,0 +1,114 @@
+type ProducerDashboardProps = {
+  fullName: string
+}
+
+const dashboardSections = [
+  {
+    number: '01',
+    title: 'My Products',
+    description:
+      'Create, update, and organize your agricultural product listings.',
+    image: '/images/producer-products.jpg',
+    imageAlt: 'Fresh tomatoes growing on the vine',
+    action: 'Manage products',
+  },
+  {
+    number: '02',
+    title: 'Incoming Orders',
+    description:
+      'Review restaurant orders and keep track of their progress.',
+    image: '/images/producer-orders.jpg',
+    imageAlt: 'Fresh vegetables packed in wooden crates',
+    action: 'View orders',
+  },
+  {
+    number: '03',
+    title: 'Inventory',
+    description:
+      'Monitor available quantities and keep your stock up to date.',
+    image: '/images/producer-inventory.jpg',
+    imageAlt: 'Freshly harvested potatoes in a burlap sack',
+    action: 'View inventory',
+  },
+]
+
+export default function ProducerDashboard({
+  fullName,
+}: ProducerDashboardProps) {
+  const firstName = fullName.trim().split(/\s+/)[0] || 'Producer'
+
+  return (
+    <section className="producer-dashboard">
+      <div className="producer-hero">
+        <div className="producer-hero-content">
+          <span className="producer-eyebrow">
+            PRODUCER WORKSPACE
+          </span>
+
+          <h1>Welcome back, {firstName}!</h1>
+
+          <p>
+            Manage your products, orders, and inventory —
+            from your farm to local restaurants.
+          </p>
+        </div>
+
+        <div
+          className="producer-hero-image"
+          role="img"
+          aria-label="Beautiful agricultural fields and fresh local produce"
+        />
+      </div>
+
+      <div className="producer-section-intro">
+        <div>
+          <h2>Your growing business</h2>
+          <p>Everything you need, thoughtfully organized.</p>
+        </div>
+      </div>
+
+      <div className="producer-dashboard-grid">
+        {dashboardSections.map((section) => (
+          <article
+            className="producer-dashboard-card"
+            key={section.number}
+          >
+            <div className="producer-card-image-wrap">
+              <img
+                src={section.image}
+                alt={section.imageAlt}
+                className="producer-card-image"
+                loading="lazy"
+              />
+            </div>
+
+            <div className="producer-card-content">
+              <span className="producer-card-number">
+                {section.number} / REKOLTA
+              </span>
+
+              <h3>{section.title}</h3>
+              <p>{section.description}</p>
+
+              <span className="producer-card-action">
+                {section.action}
+                <span aria-hidden="true"> →</span>
+              </span>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className="producer-bottom-banner">
+        <div className="producer-bottom-banner-heading">
+          <h2>Rooted locally. Growing together.</h2>
+        </div>
+
+        <p>
+          Helping Bulgarian producers bring fresh ingredients
+          closer to local restaurants.
+        </p>
+      </div>
+    </section>
+  )
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { SubmitEventHandler } from 'react'
+import ProducerDashboard from './ProducerDashboard'
 
 type AuthMode = 'login' | 'register'
 type UserRole = 'PRODUCER' | 'RESTAURANT'
@@ -252,9 +253,14 @@ export default function Auth() {
         ) : currentUser ? (
           // Authenticated user view.
           <div className="auth-account">
-            <h2>Welcome, {currentUser.fullName}!</h2>
-
-            <p>You are logged in to Rekolta.</p>
+            
+            {currentUser.role === 'PRODUCER' ? (
+  <ProducerDashboard fullName={currentUser.fullName} />) : (
+  <>
+    <h2>Welcome, {currentUser.fullName}!</h2>
+    <p>You are logged in to Rekolta.</p>
+  </>
+)}
 
             <p>
               <strong>Email:</strong> {currentUser.email}
