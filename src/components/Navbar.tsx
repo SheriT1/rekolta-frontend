@@ -7,7 +7,7 @@ function Navbar({ onNavigate }: NavbarProps) {
   return (
     <nav className="navbar">
       <img
-        src="/rekolta-logo.png"
+        src="/images/rekolta-logo.png"
         alt="Rekolta"
         className="navbar-logo"
         onClick={() => onNavigate('home')}
