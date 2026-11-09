@@ -1,8 +1,17 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { SubmitEventHandler } from 'react'
 
 type AuthMode = 'login' | 'register'
 type UserRole = 'PRODUCER' | 'RESTAURANT'
+
+type AuthUser = {
+  id: string
+  email: string
+  fullName: string
+  role: UserRole
+}
+
+const API_URL = 'http://localhost:3000'
 
 export default function Auth() {
   const [mode, setMode] = useState<AuthMode>('login')
@@ -16,6 +25,52 @@ export default function Auth() {
   const [successMessage, setSuccessMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
+  const [isCheckingSession, setIsCheckingSession] = useState(true)
+
+  // Check whether the browser already has a valid login session.
+  useEffect(() => {
+    const controller = new AbortController()
+
+    const checkSession = async () => {
+      try {
+        const response = await fetch(`${API_URL}/auth/me`, {
+          credentials: 'include',
+          signal: controller.signal,
+        })
+
+        if (response.status === 401) {
+          setCurrentUser(null)
+          return
+        }
+
+        if (!response.ok) {
+          throw new Error('Unable to verify your session.')
+        }
+
+        const data: { user: AuthUser } = await response.json()
+
+        if (!controller.signal.aborted) {
+          setCurrentUser(data.user)
+        }
+      } catch {
+        if (!controller.signal.aborted) {
+          setServerError(
+            'Unable to check your session. Please try again.'
+          )
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setIsCheckingSession(false)
+        }
+      }
+    }
+
+    void checkSession()
+
+    return () => controller.abort()
+  }, [])
+
   // Switch between Login and Registration.
   const changeMode = (newMode: AuthMode) => {
     if (isLoading) return
@@ -26,6 +81,40 @@ export default function Auth() {
     setPasswordError('')
     setServerError('')
     setSuccessMessage('')
+  }
+
+  // Log out and clear the browser authentication cookie.
+  const handleLogout = async () => {
+    if (isLoading) return
+
+    setIsLoading(true)
+    setServerError('')
+    setSuccessMessage('')
+
+    try {
+      const response = await fetch(`${API_URL}/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      })
+
+      if (!response.ok) {
+        throw new Error('Logout failed. Please try again.')
+      }
+
+      setCurrentUser(null)
+      setMode('login')
+      setPassword('')
+      setConfirmPassword('')
+      setSuccessMessage('Logged out successfully.')
+    } catch (error) {
+      setServerError(
+        error instanceof Error
+          ? error.message
+          : 'Unable to connect to the server.'
+      )
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // Send Login or Registration data to NestJS.
@@ -51,17 +140,14 @@ export default function Auth() {
       setIsLoading(true)
 
       try {
-        const response = await fetch(
-          'http://localhost:3000/auth/login',
-          {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(loginData),
-          }
-        )
+        const response = await fetch(`${API_URL}/auth/login`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(loginData),
+        })
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => null)
@@ -76,6 +162,9 @@ export default function Auth() {
           )
         }
 
+        const data: { user: AuthUser } = await response.json()
+
+        setCurrentUser(data.user)
         setSuccessMessage('Credentials verified successfully!')
         setPassword('')
         form.reset()
@@ -112,16 +201,13 @@ export default function Auth() {
     setIsLoading(true)
 
     try {
-      const response = await fetch(
-        'http://localhost:3000/auth/register',
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(registrationData),
-        }
-      )
+      const response = await fetch(`${API_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registrationData),
+      })
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null)
@@ -154,7 +240,6 @@ export default function Auth() {
   return (
     <main className="auth-page">
       <section className="auth-card">
-
         {/* Application name - logo will be added later. */}
         <h1 className="auth-title">Rekolta</h1>
 
@@ -162,197 +247,238 @@ export default function Auth() {
           Connecting local producers and restaurants
         </p>
 
-        {/* Switch between login and registration forms. */}
-        <div className="auth-tabs">
-          <button
-            type="button"
-            className={mode === 'login' ? 'active' : ''}
-            onClick={() => changeMode('login')}
-            aria-pressed={mode === 'login'}
-            disabled={isLoading}
-          >
-            Log In
-          </button>
+        {isCheckingSession ? (
+          <p role="status">Checking your session...</p>
+        ) : currentUser ? (
+          // Authenticated user view.
+          <div className="auth-account">
+            <h2>Welcome, {currentUser.fullName}!</h2>
 
-          <button
-            type="button"
-            className={mode === 'register' ? 'active' : ''}
-            onClick={() => changeMode('register')}
-            aria-pressed={mode === 'register'}
-            disabled={isLoading}
-          >
-            Sign Up
-          </button>
-        </div>
+            <p>You are logged in to Rekolta.</p>
 
-        <form onSubmit={handleSubmit}>
-          {/* Registration-specific fields. */}
-          {mode === 'register' && (
-            <>
-              <label htmlFor="role">Account Type</label>
-              <select
-                id="role"
-                value={role}
-                onChange={(event) =>
-                  setRole(event.target.value as UserRole)
-                }
+            <p>
+              <strong>Email:</strong> {currentUser.email}
+            </p>
+
+            <p>
+              <strong>Account Type:</strong>{' '}
+              {currentUser.role === 'PRODUCER'
+                ? 'Producer'
+                : 'Restaurant'}
+            </p>
+
+            {serverError && (
+              <p className="auth-error" role="alert">
+                {serverError}
+              </p>
+            )}
+
+            <button
+              type="button"
+              className="auth-submit"
+              onClick={handleLogout}
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging Out...' : 'Log Out'}
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Switch between login and registration forms. */}
+            <div className="auth-tabs">
+              <button
+                type="button"
+                className={mode === 'login' ? 'active' : ''}
+                onClick={() => changeMode('login')}
+                aria-pressed={mode === 'login'}
                 disabled={isLoading}
               >
-                <option value="PRODUCER">Producer</option>
-                <option value="RESTAURANT">Restaurant</option>
-              </select>
+                Log In
+              </button>
 
-              <label htmlFor="fullName">Full Name</label>
-              <input
-                id="fullName"
-                name="fullName"
-                type="text"
-                placeholder="Your full name"
-                autoComplete="name"
-                maxLength={150}
-                required
+              <button
+                type="button"
+                className={mode === 'register' ? 'active' : ''}
+                onClick={() => changeMode('register')}
+                aria-pressed={mode === 'register'}
                 disabled={isLoading}
-              />
-            </>
-          )}
+              >
+                Sign Up
+              </button>
+            </div>
 
-          {/* Fields shared by Login and Registration. */}
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="you@example.com"
-            autoComplete="email"
-            maxLength={255}
-            required
-            disabled={isLoading}
-          />
+            <form onSubmit={handleSubmit}>
+              {/* Registration-specific fields. */}
+              {mode === 'register' && (
+                <>
+                  <label htmlFor="role">Account Type</label>
+                  <select
+                    id="role"
+                    value={role}
+                    onChange={(event) =>
+                      setRole(event.target.value as UserRole)
+                    }
+                    disabled={isLoading}
+                  >
+                    <option value="PRODUCER">Producer</option>
+                    <option value="RESTAURANT">Restaurant</option>
+                  </select>
 
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            placeholder="Enter your password"
-            autoComplete={
-              mode === 'login' ? 'current-password' : 'new-password'
-            }
-            value={password}
-            onChange={(event) => {
-              setPassword(event.target.value)
-              setPasswordError('')
-            }}
-            minLength={mode === 'register' ? 8 : undefined}
-            required
-            disabled={isLoading}
-          />
-
-          {/* Registration-only fields. */}
-          {mode === 'register' && (
-            <>
-              <label htmlFor="confirmPassword">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                placeholder="Re-enter your password"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(event) => {
-                  setConfirmPassword(event.target.value)
-                  setPasswordError('')
-                }}
-                minLength={8}
-                required
-                disabled={isLoading}
-              />
-
-              {passwordError && (
-                <p className="auth-error" role="alert">
-                  {passwordError}
-                </p>
+                  <label htmlFor="fullName">Full Name</label>
+                  <input
+                    id="fullName"
+                    name="fullName"
+                    type="text"
+                    placeholder="Your full name"
+                    autoComplete="name"
+                    maxLength={150}
+                    required
+                    disabled={isLoading}
+                  />
+                </>
               )}
 
-              <label htmlFor="businessName">
-                {role === 'PRODUCER'
-                  ? 'Farm or Business Name'
-                  : 'Restaurant Name'}
-              </label>
+              {/* Fields shared by Login and Registration. */}
+              <label htmlFor="email">Email</label>
               <input
-                id="businessName"
-                name="businessName"
-                type="text"
-                placeholder="Business name"
-                maxLength={200}
-                required
-                disabled={isLoading}
-              />
-
-              <label htmlFor="phone">Phone Number</label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                placeholder="+359 ..."
-                autoComplete="tel"
-                maxLength={30}
-                required
-                disabled={isLoading}
-              />
-
-              <label htmlFor="address">Address</label>
-              <input
-                id="address"
-                name="address"
-                type="text"
-                placeholder="Street address"
-                autoComplete="street-address"
+                id="email"
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                autoComplete="email"
                 maxLength={255}
                 required
                 disabled={isLoading}
               />
 
-              <label htmlFor="city">City</label>
+              <label htmlFor="password">Password</label>
               <input
-                id="city"
-                name="city"
-                type="text"
-                placeholder="City"
-                autoComplete="address-level2"
-                maxLength={100}
+                id="password"
+                type="password"
+                placeholder="Enter your password"
+                autoComplete={
+                  mode === 'login'
+                    ? 'current-password'
+                    : 'new-password'
+                }
+                value={password}
+                onChange={(event) => {
+                  setPassword(event.target.value)
+                  setPasswordError('')
+                }}
+                minLength={mode === 'register' ? 8 : undefined}
                 required
                 disabled={isLoading}
               />
-            </>
-          )}
 
-          {serverError && (
-            <p className="auth-error" role="alert">
-              {serverError}
-            </p>
-          )}
+              {/* Registration-only fields. */}
+              {mode === 'register' && (
+                <>
+                  <label htmlFor="confirmPassword">
+                    Confirm Password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Re-enter your password"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(event) => {
+                      setConfirmPassword(event.target.value)
+                      setPasswordError('')
+                    }}
+                    minLength={8}
+                    required
+                    disabled={isLoading}
+                  />
 
-          {successMessage && (
-            <p role="status">
-              {successMessage}
-            </p>
-          )}
+                  {passwordError && (
+                    <p className="auth-error" role="alert">
+                      {passwordError}
+                    </p>
+                  )}
 
-          <button
-            type="submit"
-            className="auth-submit"
-            disabled={isLoading}
-          >
-            {isLoading
-              ? mode === 'login'
-                ? 'Logging In...'
-                : 'Creating Account...'
-              : mode === 'login'
-                ? 'Log In'
-                : 'Create Account'}
-          </button>
-        </form>
+                  <label htmlFor="businessName">
+                    {role === 'PRODUCER'
+                      ? 'Farm or Business Name'
+                      : 'Restaurant Name'}
+                  </label>
+                  <input
+                    id="businessName"
+                    name="businessName"
+                    type="text"
+                    placeholder="Business name"
+                    maxLength={200}
+                    required
+                    disabled={isLoading}
+                  />
+
+                  <label htmlFor="phone">Phone Number</label>
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    placeholder="+359 ..."
+                    autoComplete="tel"
+                    maxLength={30}
+                    required
+                    disabled={isLoading}
+                  />
+
+                  <label htmlFor="address">Address</label>
+                  <input
+                    id="address"
+                    name="address"
+                    type="text"
+                    placeholder="Street address"
+                    autoComplete="street-address"
+                    maxLength={255}
+                    required
+                    disabled={isLoading}
+                  />
+
+                  <label htmlFor="city">City</label>
+                  <input
+                    id="city"
+                    name="city"
+                    type="text"
+                    placeholder="City"
+                    autoComplete="address-level2"
+                    maxLength={100}
+                    required
+                    disabled={isLoading}
+                  />
+                </>
+              )}
+
+              {serverError && (
+                <p className="auth-error" role="alert">
+                  {serverError}
+                </p>
+              )}
+
+              {successMessage && (
+                <p role="status">
+                  {successMessage}
+                </p>
+              )}
+
+              <button
+                type="submit"
+                className="auth-submit"
+                disabled={isLoading}
+              >
+                {isLoading
+                  ? mode === 'login'
+                    ? 'Logging In...'
+                    : 'Creating Account...'
+                  : mode === 'login'
+                    ? 'Log In'
+                    : 'Create Account'}
+              </button>
+            </form>
+          </>
+        )}
       </section>
     </main>
   )
