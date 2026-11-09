@@ -240,7 +240,13 @@ export default function Auth() {
 
   return (
     <main className="auth-page">
-      <section className="auth-card">
+     <section
+  className={
+    currentUser?.role === 'PRODUCER'
+      ? 'auth-card auth-card--producer'
+      : 'auth-card'
+  }
+    >
         {/* Application name - logo will be added later. */}
         <h1 className="auth-title">Rekolta</h1>
 

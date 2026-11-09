@@ -24,17 +24,17 @@ function Home({ onExploreProducts }: HomeProps) {
 
           <div className="hero-images">
             <img
-              src="/fresh_produce.png"
+              src="/images/fresh_produce.png"
               alt="Fresh local vegetables"
             />
 
             <img
-              src="/local_farmer.png"
+              src="/images/local_farmer.png"
               alt="Local farmer harvesting vegetables"
             />
 
             <img
-              src="/chef_rekolta.png"
+              src="/images/chef_rekolta.png"
               alt="Restaurant chef preparing fresh produce"
             />
           </div>

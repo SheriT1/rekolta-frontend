@@ -8,7 +8,7 @@ const dashboardSections = [
     title: 'My Products',
     description:
       'Create, update, and organize your agricultural product listings.',
-    image: '/images/producer-products.jpg',
+    image: '/images/tomatoes.jpeg',
     imageAlt: 'Fresh tomatoes growing on the vine',
     action: 'Manage products',
   },
@@ -17,7 +17,7 @@ const dashboardSections = [
     title: 'Incoming Orders',
     description:
       'Review restaurant orders and keep track of their progress.',
-    image: '/images/producer-orders.jpg',
+    image: '/images/veg.jpeg',
     imageAlt: 'Fresh vegetables packed in wooden crates',
     action: 'View orders',
   },
@@ -26,7 +26,7 @@ const dashboardSections = [
     title: 'Inventory',
     description:
       'Monitor available quantities and keep your stock up to date.',
-    image: '/images/producer-inventory.jpg',
+    image: '/images/potatos.jpg',
     imageAlt: 'Freshly harvested potatoes in a burlap sack',
     action: 'View inventory',
   },

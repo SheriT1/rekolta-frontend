@@ -508,6 +508,9 @@
 
 /* Photographic welcome banner */
 
+
+/* Photographic welcome banner */
+
 .producer-hero {
   position: relative;
   display: flex;
@@ -516,36 +519,43 @@
   padding: 48px;
   overflow: hidden;
   border-radius: 24px;
-  background: #194d34;
+  background-color: #194d34;
   isolation: isolate;
 }
+
+/* Farm photograph */
 
 .producer-hero-image {
   position: absolute;
   inset: 0;
-  z-index: -2;
-  background-image: url('/images/producer-hero.jpg');
+  z-index: 0;
+  background-image: url('/images/greenfield.jpg');
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
 }
+
+/* Green gradient over the photograph */
 
 .producer-hero::before {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 1;
   background: linear-gradient(
     90deg,
-    rgba(18, 58, 35, 0.96) 0%,
-    rgba(18, 58, 35, 0.86) 42%,
-    rgba(18, 58, 35, 0.12) 100%
+    rgba(18, 58, 35, 0.98) 0%,
+    rgba(18, 58, 35, 0.9) 35%,
+    rgba(18, 58, 35, 0.35) 65%,
+    rgba(18, 58, 35, 0.05) 100%
   );
+  pointer-events: none;
 }
 
 .producer-hero-content {
   position: relative;
   max-width: 540px;
-  z-index: 1;
+  z-index: 2;
 }
 
 .producer-eyebrow {
@@ -802,5 +812,18 @@
 
   .producer-dashboard-card:hover .producer-card-image {
     transform: none;
+  }
+}
+
+/* Wider layout for authenticated Producers */
+
+.auth-card.auth-card--producer {
+  max-width: 1200px;
+  padding: 36px;
+}
+
+@media (max-width: 650px) {
+  .auth-card.auth-card--producer {
+    padding: 20px;
   }
 }
