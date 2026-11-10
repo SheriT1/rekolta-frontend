@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { SubmitEventHandler } from 'react'
 import ProducerDashboard from './ProducerDashboard'
 
@@ -14,7 +14,12 @@ type AuthUser = {
 
 const API_URL = 'http://localhost:3000'
 
-export default function Auth() {
+type AuthProps = {
+  currentUser: AuthUser | null
+  onLogin: (user: AuthUser) => void
+}
+
+export default function Auth({ currentUser, onLogin }: AuthProps) {
   const [mode, setMode] = useState<AuthMode>('login')
   const [role, setRole] = useState<UserRole>('PRODUCER')
 
@@ -26,52 +31,6 @@ export default function Auth() {
   const [successMessage, setSuccessMessage] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
-  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
-  const [isCheckingSession, setIsCheckingSession] = useState(true)
-
-  // Check whether the browser already has a valid login session.
-  useEffect(() => {
-    const controller = new AbortController()
-
-    const checkSession = async () => {
-      try {
-        const response = await fetch(`${API_URL}/auth/me`, {
-          credentials: 'include',
-          signal: controller.signal,
-        })
-
-        if (response.status === 401) {
-          setCurrentUser(null)
-          return
-        }
-
-        if (!response.ok) {
-          throw new Error('Unable to verify your session.')
-        }
-
-        const data: { user: AuthUser } = await response.json()
-
-        if (!controller.signal.aborted) {
-          setCurrentUser(data.user)
-        }
-      } catch {
-        if (!controller.signal.aborted) {
-          setServerError(
-            'Unable to check your session. Please try again.'
-          )
-        }
-      } finally {
-        if (!controller.signal.aborted) {
-          setIsCheckingSession(false)
-        }
-      }
-    }
-
-    void checkSession()
-
-    return () => controller.abort()
-  }, [])
-
   // Switch between Login and Registration.
   const changeMode = (newMode: AuthMode) => {
     if (isLoading) return
@@ -82,40 +41,6 @@ export default function Auth() {
     setPasswordError('')
     setServerError('')
     setSuccessMessage('')
-  }
-
-  // Log out and clear the browser authentication cookie.
-  const handleLogout = async () => {
-    if (isLoading) return
-
-    setIsLoading(true)
-    setServerError('')
-    setSuccessMessage('')
-
-    try {
-      const response = await fetch(`${API_URL}/auth/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        throw new Error('Logout failed. Please try again.')
-      }
-
-      setCurrentUser(null)
-      setMode('login')
-      setPassword('')
-      setConfirmPassword('')
-      setSuccessMessage('Logged out successfully.')
-    } catch (error) {
-      setServerError(
-        error instanceof Error
-          ? error.message
-          : 'Unable to connect to the server.'
-      )
-    } finally {
-      setIsLoading(false)
-    }
   }
 
   // Send Login or Registration data to NestJS.
@@ -165,7 +90,7 @@ export default function Auth() {
 
         const data: { user: AuthUser } = await response.json()
 
-        setCurrentUser(data.user)
+        onLogin(data.user)
         setSuccessMessage('Credentials verified successfully!')
         setPassword('')
         form.reset()
@@ -240,60 +165,32 @@ export default function Auth() {
 
   return (
     <main className="auth-page">
-     <section
-  className={
-    currentUser?.role === 'PRODUCER'
-      ? 'auth-card auth-card--producer'
-      : 'auth-card'
-  }
-    >
-      
-       {currentUser?.role !== 'PRODUCER' && (
-  <>
-    <h1>Rekolta</h1>
-    <p>Connecting local producers and restaurants</p>
-  </>
-)}
+      <section
+        className={
+          currentUser?.role === 'PRODUCER'
+            ? 'auth-card auth-card--producer'
+            : 'auth-card'
+        }
+      >
+        {currentUser?.role !== 'PRODUCER' && (
+          <>
+            <h1>Rekolta</h1>
+            <p>Connecting local producers and restaurants</p>
+          </>
+        )}
 
-        {isCheckingSession ? (
-          <p role="status">Checking your session...</p>
-        ) : currentUser ? (
-          // Authenticated user view.
+        {currentUser ? (
           <div className="auth-account">
-            
             {currentUser.role === 'PRODUCER' ? (
-  <ProducerDashboard fullName={currentUser.fullName} />) : (
-  <>
-    <h2>Welcome, {currentUser.fullName}!</h2>
-    <p>You are logged in to Rekolta.</p>
-  </>
-)}
-
-            <p>
-              <strong>Email:</strong> {currentUser.email}
-            </p>
-
-            <p>
-              <strong>Account Type:</strong>{' '}
-              {currentUser.role === 'PRODUCER'
-                ? 'Producer'
-                : 'Restaurant'}
-            </p>
-
-            {serverError && (
-              <p className="auth-error" role="alert">
-                {serverError}
-              </p>
+              <ProducerDashboard fullName={currentUser.fullName} />
+            ) : (
+              <>
+                <h2>Welcome, {currentUser.fullName}!</h2>
+                <p>You are logged in to Rekolta.</p>
+                <p><strong>Email:</strong> {currentUser.email}</p>
+                <p><strong>Account Type:</strong> Restaurant</p>
+              </>
             )}
-
-            <button
-              type="button"
-              className="auth-submit"
-              onClick={handleLogout}
-              disabled={isLoading}
-            >
-              {isLoading ? 'Logging Out...' : 'Log Out'}
-            </button>
           </div>
         ) : (
           <>

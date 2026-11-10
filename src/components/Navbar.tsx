@@ -1,9 +1,19 @@
 
+type Page = 'home' | 'products' | 'auth'
+
 type NavbarProps = {
-  onNavigate: (page: 'home' | 'products' | 'auth') => void
+  onNavigate: (page: Page) => void
+  isLoggedIn: boolean
+  onLogout: () => void
+  isLoggingOut?: boolean
 }
 
-function Navbar({ onNavigate }: NavbarProps) {
+export default function Navbar({
+  onNavigate,
+  isLoggedIn,
+  onLogout,
+  isLoggingOut = false,
+}: NavbarProps) {
   return (
     <nav className="navbar">
       <img
@@ -14,23 +24,39 @@ function Navbar({ onNavigate }: NavbarProps) {
       />
 
       <div className="navbar-links">
-        <button onClick={() => onNavigate('home')}>
+        <button
+          type="button"
+          onClick={() => onNavigate('home')}
+        >
           Home
         </button>
 
-        <button onClick={() => onNavigate('products')}>
+        <button
+          type="button"
+          onClick={() => onNavigate('products')}
+        >
           Products
         </button>
 
-        <button
-          className="login-btn"
-          onClick={() => onNavigate('auth')}
-        >
-          Log In / Sign Up
-        </button>
+        {isLoggedIn ? (
+          <button
+            type="button"
+            className="login-btn"
+            onClick={onLogout}
+            disabled={isLoggingOut}
+          >
+            {isLoggingOut ? 'Logging Out...' : 'Log Out'}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="login-btn"
+            onClick={() => onNavigate('auth')}
+          >
+            Log In / Sign Up
+          </button>
+        )}
       </div>
     </nav>
   )
 }
-
-export default Navbar
