@@ -1,4 +1,3 @@
-
 /* Rekolta Fresh Leaf color palette */
 :root {
   --green-primary: #258c3e;
@@ -499,63 +498,58 @@
   }
 }
 
-/*REKOLTA PRODUCER DASHBOARD*/
+/* =========================================================
+   REKOLTA PRODUCER DASHBOARD
+   Consolidated styles — photographic cards with a thin
+   sage-green line between the image and white content.
+   ========================================================= */
 
 .producer-dashboard {
   width: 100%;
   color: var(--green-dark);
 }
 
-/* Photographic welcome banner */
-
-
-/* Photographic welcome banner */
-
+/* Welcome banner */
 .producer-hero {
   position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
-  min-height: 340px;
-  padding: 48px;
+  min-height: 220px;
+  padding: 28px 40px;
   overflow: hidden;
-  border-radius: 24px;
-  background-color: #194d34;
-  isolation: isolate;
+  border-radius: 22px;
+  background: #194d34;
 }
-
-/* Farm photograph */
 
 .producer-hero-image {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: url('/images/greenfield.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: url('/images/greenfield.jpg') center / cover no-repeat;
 }
 
-/* Green gradient over the photograph */
 
 .producer-hero::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(
-    90deg,
-    rgba(18, 58, 35, 0.98) 0%,
-    rgba(18, 58, 35, 0.9) 35%,
-    rgba(18, 58, 35, 0.35) 65%,
-    rgba(18, 58, 35, 0.05) 100%
-  );
   pointer-events: none;
+
+  
+background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 250' preserveAspectRatio='none'%3E%3Cpath d='M0 0 H350 C450 0 440 85 490 150 S550 235 600 250 H0 Z' fill='%23174a2d'/%3E%3C/svg%3E");
+
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 }
+
+
 
 .producer-hero-content {
   position: relative;
-  max-width: 540px;
-  z-index: 2;
+  max-width: 430px;
+  z-index: 3;
 }
 
 .producer-eyebrow {
@@ -568,63 +562,64 @@
 }
 
 .producer-hero h1 {
-  margin: 0 0 18px;
-  color: #ffffff;
-  font-size: clamp(30px, 4vw, 48px);
+  margin: 0 0 10px;
+  color: #fff;
+  font-size: clamp(28px, 3vw, 38px);
   font-weight: 800;
   line-height: 1.15;
-  letter-spacing: -1.5px;
+  letter-spacing: -1px;
 }
 
 .producer-hero p {
-  max-width: 440px;
+  max-width: 400px;
   margin: 0;
   color: #e5f2e3;
-  font-size: 16px;
-  line-height: 1.8;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 /* Section heading */
-
 .producer-section-intro {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  margin: 44px 0 24px;
+  margin: 28px 0 22px;
 }
 
 .producer-section-intro h2 {
   margin: 0 0 8px;
-  color: #24452b;
-  font-size: clamp(26px, 3vw, 34px);
-  font-weight: 800;
+  color: #173e26;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(29px, 3vw, 38px);
+  font-weight: 700;
   letter-spacing: -0.8px;
 }
 
 .producer-section-intro p {
   margin: 0;
-  color: #718273;
-  font-size: 15px;
+  color: #4b6552;
+  font-size: 16px;
 }
 
-/* Dashboard cards */
-
+/* Three compact dashboard cards */
 .producer-dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  gap: 20px;
+  align-items: stretch;
 }
 
 .producer-dashboard-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid #e0eade;
+  border: 1px solid #e2ebde;
   border-radius: 20px;
-  background: #ffffff;
-  box-shadow: 0 8px 28px rgba(36, 69, 43, 0.06);
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+  background: #fffefa;
+  box-shadow: 0 8px 24px rgba(36, 69, 43, 0.07);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .producer-dashboard-card:hover {
@@ -632,10 +627,13 @@
   box-shadow: 0 16px 36px rgba(36, 69, 43, 0.12);
 }
 
+/* Photograph container and smooth SVG wave */
 .producer-card-image-wrap {
+  position: relative;
   height: 200px;
+  flex-shrink: 0;
   overflow: hidden;
-  background: #e7f1e2;
+  background: #e5eedf;
 }
 
 .producer-card-image {
@@ -650,47 +648,80 @@
   transform: scale(1.05);
 }
 
+/* White wave with a soft green curved edge */
+
+
+.producer-card-image-wrap::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 62px;
+  pointer-events: none;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 80' preserveAspectRatio='none'%3E%3Cpath d='M0 28 C95 -8 175 8 245 35 S345 70 400 68 L400 80 L0 80 Z' fill='%23fffefa'/%3E%3Cpath d='M0 28 C95 -8 175 8 245 35 S345 70 400 68' fill='none' stroke='%23b8d69d' stroke-width='7'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+/* Remove the old polygon layers */
+
+.producer-card-content::before,
+.producer-card-content::after {
+  content: none;
+}
+
+/* Text is kept compact; no overlapping pseudo-elements here. */
 .producer-card-content {
+  position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 220px;
-  padding: 24px;
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0 20px 12px;
+  background: #fffefa;
 }
 
 .producer-card-number {
-  color: #6b9c72;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
+  display: none;
 }
 
 .producer-card-content h3 {
-  margin: 12px 0 10px;
-  color: #24452b;
+  margin: 0 0 6px;
+  color: #173e26;
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: 23px;
-  font-weight: 750;
+  font-weight: 700;
+  line-height: 1.15;
   letter-spacing: -0.5px;
 }
 
 .producer-card-content p {
-  margin: 0 0 24px;
-  color: #6a7c6d;
-  font-size: 14px;
-  line-height: 1.7;
+  margin: 0 0 10px;
+  color: #43584a;
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .producer-card-action {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  align-self: flex-start;
+  gap: 10px;
   margin-top: auto;
-  color: var(--green-primary);
-  font-size: 14px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: #287a35;
+  color: #fff;
+  font-size: 12px;
   font-weight: 700;
+  box-shadow: 0 3px 8px rgba(27, 94, 43, 0.12);
 }
 
-/* Bottom brand banner */
-
+/* Lower brand banner */
 .producer-bottom-banner {
   display: flex;
   align-items: center;
@@ -699,13 +730,8 @@
   margin-top: 36px;
   padding: 36px 40px;
   border: 1px solid #dce9d7;
-  border-radius: 20px;
-  background: linear-gradient(
-    110deg,
-    #e0f0d8 0%,
-    #f4f9ed 65%,
-    #e8f3e1 100%
-  );
+  border-radius: 22px;
+  background: linear-gradient(110deg, #dcefd3, #f5faee 60%, #e6f3dd);
 }
 
 .producer-bottom-banner-heading {
@@ -729,16 +755,15 @@
   line-height: 1.8;
 }
 
-/* Tablet */
+/* Wider authentication card for logged-in producers only */
+.auth-card.auth-card--producer {
+  max-width: 1200px;
+  padding: 36px;
+}
 
 @media (max-width: 950px) {
   .producer-dashboard-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .producer-hero {
-    min-height: 300px;
-    padding: 36px;
   }
 
   .producer-bottom-banner {
@@ -746,29 +771,26 @@
   }
 }
 
-/* Mobile */
-
 @media (max-width: 650px) {
+  .auth-card.auth-card--producer {
+    padding: 20px;
+  }
+
   .producer-hero {
-    min-height: 300px;
-    padding: 28px 24px;
+    min-height: 200px;
+    padding: 24px;
     border-radius: 18px;
   }
 
-  .producer-hero::before {
-    background: linear-gradient(
-      90deg,
-      rgba(18, 58, 35, 0.95),
-      rgba(18, 58, 35, 0.65)
-    );
-  }
+  
+
+
+
+
+
 
   .producer-hero h1 {
-    font-size: 32px;
-  }
-
-  .producer-hero p {
-    font-size: 14px;
+    font-size: 28px;
   }
 
   .producer-section-intro {
@@ -784,11 +806,6 @@
     height: 190px;
   }
 
-  .producer-card-content {
-    min-height: auto;
-    padding: 22px;
-  }
-
   .producer-bottom-banner {
     flex-direction: column;
     align-items: flex-start;
@@ -798,32 +815,14 @@
   }
 }
 
-/* Respect reduced-motion preferences */
-
 @media (prefers-reduced-motion: reduce) {
   .producer-dashboard-card,
   .producer-card-image {
     transition: none;
   }
 
-  .producer-dashboard-card:hover {
-    transform: none;
-  }
-
+  .producer-dashboard-card:hover,
   .producer-dashboard-card:hover .producer-card-image {
     transform: none;
-  }
-}
-
-/* Wider layout for authenticated Producers */
-
-.auth-card.auth-card--producer {
-  max-width: 1200px;
-  padding: 36px;
-}
-
-@media (max-width: 650px) {
-  .auth-card.auth-card--producer {
-    padding: 20px;
   }
 }

@@ -247,12 +247,13 @@ export default function Auth() {
       : 'auth-card'
   }
     >
-        {/* Application name - logo will be added later. */}
-        <h1 className="auth-title">Rekolta</h1>
-
-        <p className="auth-subtitle">
-          Connecting local producers and restaurants
-        </p>
+      
+       {currentUser?.role !== 'PRODUCER' && (
+  <>
+    <h1>Rekolta</h1>
+    <p>Connecting local producers and restaurants</p>
+  </>
+)}
 
         {isCheckingSession ? (
           <p role="status">Checking your session...</p>
