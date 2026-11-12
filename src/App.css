@@ -886,3 +886,255 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     transform: none;
   }
 }
+
+/* ==========================================
+   REKOLTA - MY PRODUCTS PAGE
+   ========================================== */
+
+.my-products-page {
+  min-height: 100vh;
+  padding: 48px 6% 80px;
+  background: var(--green-background);
+  color: var(--green-dark);
+}
+
+.my-products-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.my-products-back {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #397a42;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.my-products-back:hover {
+  color: #173e26;
+}
+
+.my-products-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+.my-products-eyebrow {
+  display: block;
+  margin-bottom: 14px;
+  color: #5a8656;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.my-products-header h1 {
+  margin: 0 0 12px;
+  color: #173e26;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(34px, 4vw, 48px);
+  letter-spacing: -1px;
+}
+
+.my-products-header p {
+  max-width: 540px;
+  margin: 0;
+  color: #4b6552;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.my-products-add-button {
+  flex-shrink: 0;
+  padding: 14px 22px;
+  border: none;
+  border-radius: 10px;
+  background: #287a35;
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.my-products-add-button:hover:not(:disabled) {
+  background: #1c5f2a;
+}
+
+.my-products-add-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.my-products-summary {
+  margin-bottom: 20px;
+  color: #557358;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.my-products-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.my-products-card {
+  min-width: 0;
+  border: 1px solid #e2ebde;
+  border-radius: 18px;
+  background: #fffefa;
+  box-shadow: 0 8px 24px rgba(36, 69, 43, 0.07);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.my-products-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(36, 69, 43, 0.12);
+}
+
+.my-products-card-content {
+  padding: 24px;
+}
+
+.my-products-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.my-products-card-label {
+  color: #5a8656;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.my-products-status {
+  padding: 6px 11px;
+  border-radius: 20px;
+  background: #e5f3df;
+  color: #287a35;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.my-products-status--inactive {
+  background: #f0ede6;
+  color: #82745e;
+}
+
+.my-products-card h2 {
+  margin: 0 0 12px;
+  color: #173e26;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 25px;
+  line-height: 1.2;
+}
+
+.my-products-description {
+  margin: 0 0 24px;
+  color: #526852;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.my-products-details {
+  display: grid;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid #e5eddf;
+}
+
+.my-products-details > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.my-products-details span {
+  color: #708174;
+  font-size: 12px;
+}
+
+.my-products-details strong {
+  color: #24452b;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.my-products-message,
+.my-products-empty {
+  padding: 55px 24px;
+  border: 1px solid #e2ebde;
+  border-radius: 18px;
+  background: #fffefa;
+  text-align: center;
+  color: #526852;
+}
+
+.my-products-empty h2 {
+  margin: 0 0 12px;
+  color: #173e26;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.my-products-empty p {
+  margin: 0;
+}
+
+.my-products-error {
+  padding: 18px 22px;
+  border-radius: 12px;
+  background: #fff0ed;
+  color: #a33c2e;
+  font-size: 14px;
+}
+
+/* Tablet */
+
+@media (max-width: 950px) {
+  .my-products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 650px) {
+  .my-products-page {
+    padding: 30px 5% 60px;
+  }
+
+  .my-products-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .my-products-add-button {
+    width: 100%;
+  }
+
+  .my-products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .my-products-card-content {
+    padding: 20px;
+  }
+}
+

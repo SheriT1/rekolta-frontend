@@ -4,9 +4,10 @@ import Home from './components/Home'
 import Navbar from './components/Navbar'
 import Products from './components/Products'
 import Auth from './components/Auth'
+import MyProducts from './components/MyProducts'
 import './App.css'
 
-type Page = 'home' | 'products' | 'auth'
+type Page = 'home' | 'products' | 'auth' | 'my-products'
 
 type AuthUser = {
   id: string
@@ -41,8 +42,7 @@ function App() {
           setCurrentUser(data.user)
         }
       } catch {
-        // The Navbar remains in its logged-out state
-        // if the session cannot be verified.
+        // Keep the logged-out state if session verification fails.
       }
     }
 
@@ -80,10 +80,16 @@ function App() {
     }
   }
 
+  const handleManageProducts = () => {
+    if (currentUser?.role === 'PRODUCER') {
+      setPage('my-products')
+    }
+  }
+
   return (
     <>
       <Navbar
-        onNavigate={setPage}
+        onNavigate={(nextPage) => setPage(nextPage)}
         isLoggedIn={currentUser !== null}
         onLogout={handleLogout}
         isLoggingOut={isLoggingOut}
@@ -101,11 +107,16 @@ function App() {
 
       {page === 'products' && <Products />}
 
-    {page === 'auth' && (
-  <Auth
-    currentUser={currentUser}
-    onLogin={setCurrentUser}
-  />
+      {page === 'auth' && (
+        <Auth
+          currentUser={currentUser}
+          onLogin={setCurrentUser}
+          onManageProducts={handleManageProducts}
+        />
+      )}
+
+      {page === 'my-products' && currentUser?.role === 'PRODUCER' && (
+  <MyProducts onBack={() => setPage('auth')} />
 )}
     </>
   )

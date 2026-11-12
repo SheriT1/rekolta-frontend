@@ -17,9 +17,14 @@ const API_URL = 'http://localhost:3000'
 type AuthProps = {
   currentUser: AuthUser | null
   onLogin: (user: AuthUser) => void
+  onManageProducts: () => void
 }
 
-export default function Auth({ currentUser, onLogin }: AuthProps) {
+export default function Auth({
+  currentUser,
+  onLogin,
+  onManageProducts,
+}: AuthProps) {
   const [mode, setMode] = useState<AuthMode>('login')
   const [role, setRole] = useState<UserRole>('PRODUCER')
 
@@ -182,7 +187,10 @@ export default function Auth({ currentUser, onLogin }: AuthProps) {
         {currentUser ? (
           <div className="auth-account">
             {currentUser.role === 'PRODUCER' ? (
-              <ProducerDashboard fullName={currentUser.fullName} />
+             <ProducerDashboard
+              fullName={currentUser.fullName}
+              onManageProducts={onManageProducts}
+              />
             ) : (
               <>
                 <h2>Welcome, {currentUser.fullName}!</h2>
