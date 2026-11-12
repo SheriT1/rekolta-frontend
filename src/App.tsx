@@ -7,13 +7,18 @@ import Auth from './components/Auth'
 import MyProducts from './components/MyProducts'
 import './App.css'
 
-type Page = 'home' | 'products' | 'auth' | 'my-products'
+type Page =
+  | 'home'
+  | 'products'
+  | 'auth'
+  | 'dashboard'
+  | 'my-products'
 
 type AuthUser = {
   id: string
   email: string
   fullName: string
-  role: 'PRODUCER' | 'RESTAURANT'
+  role: 'PRODUCER' | 'RESTAURANT' | 'ADMIN'
 }
 
 const API_URL = 'http://localhost:3000'
@@ -80,6 +85,17 @@ function App() {
     }
   }
 
+  const handleNavigate = (
+    nextPage: 'home' | 'products' | 'auth' | 'dashboard'
+  ) => {
+    if (nextPage === 'dashboard' && !currentUser) {
+      setPage('auth')
+      return
+    }
+
+    setPage(nextPage)
+  }
+
   const handleManageProducts = () => {
     if (currentUser?.role === 'PRODUCER') {
       setPage('my-products')
@@ -89,7 +105,7 @@ function App() {
   return (
     <>
       <Navbar
-        onNavigate={(nextPage) => setPage(nextPage)}
+        onNavigate={handleNavigate}
         isLoggedIn={currentUser !== null}
         onLogout={handleLogout}
         isLoggingOut={isLoggingOut}
@@ -107,7 +123,7 @@ function App() {
 
       {page === 'products' && <Products />}
 
-      {page === 'auth' && (
+      {(page === 'auth' || page === 'dashboard') && (
         <Auth
           currentUser={currentUser}
           onLogin={setCurrentUser}
@@ -115,9 +131,10 @@ function App() {
         />
       )}
 
-      {page === 'my-products' && currentUser?.role === 'PRODUCER' && (
-  <MyProducts onBack={() => setPage('auth')} />
-)}
+      {page === 'my-products' &&
+        currentUser?.role === 'PRODUCER' && (
+          <MyProducts onBack={() => setPage('dashboard')} />
+        )}
     </>
   )
 }

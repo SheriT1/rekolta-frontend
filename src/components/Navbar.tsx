@@ -1,5 +1,5 @@
 
-type Page = 'home' | 'products' | 'auth'
+type Page = 'home' | 'products' | 'auth' | 'dashboard'
 
 type NavbarProps = {
   onNavigate: (page: Page) => void
@@ -39,14 +39,23 @@ export default function Navbar({
         </button>
 
         {isLoggedIn ? (
-          <button
-            type="button"
-            className="login-btn"
-            onClick={onLogout}
-            disabled={isLoggingOut}
-          >
-            {isLoggingOut ? 'Logging Out...' : 'Log Out'}
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => onNavigate('dashboard')}
+            >
+              Dashboard
+            </button>
+
+            <button
+              type="button"
+              className="login-btn"
+              onClick={onLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? 'Logging Out...' : 'Log Out'}
+            </button>
+          </>
         ) : (
           <button
             type="button"
