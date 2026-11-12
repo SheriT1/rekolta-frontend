@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react'
+import AddProduct from './AddProduct'
 
 const API_URL = 'http://localhost:3000'
 
@@ -10,11 +11,14 @@ type Product = {
   price: string | number
   unit: string
   quality: string | null
-  availableQuantity: string | number
-  availableFrom: string | null
-  availableUntil: string | null
+  availableQuantity?: string | number
+  available_quantity?: string | number
+  availableFrom?: string | null
+  availableUntil?: string | null
   isActive?: boolean
   isVisible?: boolean
+  is_active?: boolean
+  is_visible?: boolean
 }
 
 type MyProductsProps = {
@@ -25,11 +29,16 @@ export default function MyProducts({ onBack }: MyProductsProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [showAddProduct, setShowAddProduct] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
 
     const loadProducts = async () => {
+      setIsLoading(true)
+      setError('')
+
       try {
         const response = await fetch(`${API_URL}/products/mine`, {
           credentials: 'include',
@@ -69,7 +78,7 @@ export default function MyProducts({ onBack }: MyProductsProps) {
     void loadProducts()
 
     return () => controller.abort()
-  }, [])
+  }, [refreshKey])
 
   const formatPrice = (price: string | number) => {
     const value = Number(price)
@@ -77,6 +86,20 @@ export default function MyProducts({ onBack }: MyProductsProps) {
     return Number.isFinite(value)
       ? value.toFixed(2)
       : String(price)
+  }
+
+  const handleProductCreated = () => {
+    setShowAddProduct(false)
+    setRefreshKey((previous) => previous + 1)
+  }
+
+  if (showAddProduct) {
+    return (
+      <AddProduct
+        onBack={() => setShowAddProduct(false)}
+        onProductCreated={handleProductCreated}
+      />
+    )
   }
 
   return (
@@ -107,8 +130,7 @@ export default function MyProducts({ onBack }: MyProductsProps) {
           <button
             type="button"
             className="my-products-add-button"
-            disabled
-            title="Product creation form coming next"
+            onClick={() => setShowAddProduct(true)}
           >
             + Add New Product
           </button>
@@ -146,65 +168,74 @@ export default function MyProducts({ onBack }: MyProductsProps) {
             </div>
 
             <div className="my-products-grid">
-              {products.map((product) => (
-                <article
-                  className="my-products-card"
-                  key={product.id}
-                >
-                  <div className="my-products-card-content">
-                    <div className="my-products-card-top">
-                      <span className="my-products-card-label">
-                        FARM PRODUCT
-                      </span>
+              {products.map((product) => {
+                const availableQuantity =
+                  product.availableQuantity ??
+                  product.available_quantity ??
+                  0
 
-                      <span
-                        className={
-                          product.isActive === false ||
-                          product.isVisible === false
-                            ? 'my-products-status my-products-status--inactive'
-                            : 'my-products-status'
-                        }
-                      >
-                        {product.isActive === false ||
-                        product.isVisible === false
-                          ? 'Inactive'
-                          : 'Active'}
-                      </span>
-                    </div>
+                const isInactive =
+                  product.isActive === false ||
+                  product.isVisible === false ||
+                  product.is_active === false ||
+                  product.is_visible === false
 
-                    <h2>{product.name}</h2>
+                return (
+                  <article
+                    className="my-products-card"
+                    key={product.id}
+                  >
+                    <div className="my-products-card-content">
+                      <div className="my-products-card-top">
+                        <span className="my-products-card-label">
+                          FARM PRODUCT
+                        </span>
 
-                    {product.description && (
-                      <p className="my-products-description">
-                        {product.description}
-                      </p>
-                    )}
-
-                    <div className="my-products-details">
-                      <div>
-                        <span>Price</span>
-                        <strong>
-                          {formatPrice(product.price)} / {product.unit}
-                        </strong>
+                        <span
+                          className={
+                            isInactive
+                              ? 'my-products-status my-products-status--inactive'
+                              : 'my-products-status'
+                          }
+                        >
+                          {isInactive ? 'Inactive' : 'Active'}
+                        </span>
                       </div>
 
-                      <div>
-                        <span>Available quantity</span>
-                        <strong>
-                          {product.availableQuantity} {product.unit}
-                        </strong>
-                      </div>
+                      <h2>{product.name}</h2>
 
-                      {product.quality && (
-                        <div>
-                          <span>Quality</span>
-                          <strong>{product.quality}</strong>
-                        </div>
+                      {product.description && (
+                        <p className="my-products-description">
+                          {product.description}
+                        </p>
                       )}
+
+                      <div className="my-products-details">
+                        <div>
+                          <span>Price</span>
+                          <strong>
+                            {formatPrice(product.price)} / {product.unit}
+                          </strong>
+                        </div>
+
+                        <div>
+                          <span>Available quantity</span>
+                          <strong>
+                            {availableQuantity} {product.unit}
+                          </strong>
+                        </div>
+
+                        {product.quality && (
+                          <div>
+                            <span>Quality</span>
+                            <strong>{product.quality}</strong>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                )
+              })}
             </div>
           </>
         )}
