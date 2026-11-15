@@ -15,6 +15,9 @@ type Product = {
   available_quantity?: string | number
   availableFrom?: string | null
   availableUntil?: string | null
+  category_id?: string
+  available_from?: string | null
+  available_until?: string | null
   isActive?: boolean
   isVisible?: boolean
   is_active?: boolean
@@ -30,6 +33,7 @@ export default function MyProducts({ onBack }: MyProductsProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [showAddProduct, setShowAddProduct] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
@@ -88,19 +92,50 @@ export default function MyProducts({ onBack }: MyProductsProps) {
       : String(price)
   }
 
-  const handleProductCreated = () => {
-    setShowAddProduct(false)
-    setRefreshKey((previous) => previous + 1)
-  }
+const handleProductSaved = () => {
+  setShowAddProduct(false)
+  setEditingProduct(null)
+  setRefreshKey((previous) => previous + 1)
+}
 
   if (showAddProduct) {
     return (
       <AddProduct
         onBack={() => setShowAddProduct(false)}
-        onProductCreated={handleProductCreated}
+        onProductCreated={handleProductSaved}
       />
     )
   }
+  if (editingProduct) {
+  return (
+    <main className="my-products-page">
+      <div className="my-products-container">
+        <button
+          type="button"
+          className="my-products-back"
+          onClick={() => setEditingProduct(null)}
+        >
+          ← Back to My Products
+        </button>
+
+        <div className="my-products-header">
+          <div>
+            <span className="my-products-eyebrow">
+              PRODUCER WORKSPACE / REKOLTA
+            </span>
+
+            <h1>Edit Product</h1>
+
+            <p>
+              Editing {editingProduct.name}.
+              The product form will be connected next.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  )
+}
 
   return (
     <main className="my-products-page">
@@ -232,7 +267,14 @@ export default function MyProducts({ onBack }: MyProductsProps) {
                           </div>
                         )}
                       </div>
-                    </div>
+                      <button
+                        type="button"
+                        className="my-products-edit-button"
+                        onClick={() => setEditingProduct(product)}
+                        >
+                        Edit Product
+                        </button>
+                 </div>
                   </article>
                 )
               })}

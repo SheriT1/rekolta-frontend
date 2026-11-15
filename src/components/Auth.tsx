@@ -3,7 +3,7 @@ import type { SubmitEventHandler } from 'react'
 import ProducerDashboard from './ProducerDashboard'
 
 type AuthMode = 'login' | 'register'
-type UserRole = 'PRODUCER' | 'RESTAURANT'
+type UserRole = 'PRODUCER' | 'RESTAURANT' | 'ADMIN'
 
 type AuthUser = {
   id: string

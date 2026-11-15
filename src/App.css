@@ -1353,3 +1353,26 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     width: 100%;
   }
 }
+/* Edit Product button inside product cards */
+.my-products-edit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  width: fit-content;
+  margin-top: 22px;
+  padding: 10px 18px;
+  background-color: #287a35;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.my-products-edit-button:hover {
+  background-color: #1e6029;
+}
