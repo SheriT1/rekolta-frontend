@@ -108,32 +108,12 @@ const handleProductSaved = () => {
   }
   if (editingProduct) {
   return (
-    <main className="my-products-page">
-      <div className="my-products-container">
-        <button
-          type="button"
-          className="my-products-back"
-          onClick={() => setEditingProduct(null)}
-        >
-          ← Back to My Products
-        </button>
-
-        <div className="my-products-header">
-          <div>
-            <span className="my-products-eyebrow">
-              PRODUCER WORKSPACE / REKOLTA
-            </span>
-
-            <h1>Edit Product</h1>
-
-            <p>
-              Editing {editingProduct.name}.
-              The product form will be connected next.
-            </p>
-          </div>
-        </div>
-      </div>
-    </main>
+    <AddProduct
+      key={editingProduct.id}
+      productToEdit={editingProduct}
+      onBack={() => setEditingProduct(null)}
+      onProductCreated={handleProductSaved}
+    />
   )
 }
 

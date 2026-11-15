@@ -26,9 +26,26 @@ const categories = [
   },
 ]
 
+type EditableProduct = {
+  id: string
+  name: string
+  description: string | null
+  price: string | number
+  unit: string
+  quality: string | null
+  category_id?: string
+  available_quantity?: string | number
+  availableQuantity?: string | number
+  available_from?: string | null
+  available_until?: string | null
+  availableFrom?: string | null
+  availableUntil?: string | null
+}
+
 type AddProductProps = {
   onBack: () => void
   onProductCreated: () => void
+  productToEdit?: EditableProduct
 }
 
 type ProductForm = {
@@ -58,8 +75,38 @@ const initialForm: ProductForm = {
 export default function AddProduct({
   onBack,
   onProductCreated,
+  productToEdit,
 }: AddProductProps) {
-  const [form, setForm] = useState<ProductForm>(initialForm)
+
+  const [form, setForm] = useState<ProductForm>(() => {
+    if (!productToEdit) {
+      return { ...initialForm }
+    }
+
+    return {
+      name: productToEdit.name,
+      categoryId: productToEdit.category_id ?? '',
+      description: productToEdit.description ?? '',
+      price: String(productToEdit.price),
+      unit: productToEdit.unit,
+      quality: productToEdit.quality ?? '',
+      availableQuantity: String(
+        productToEdit.available_quantity ??
+        productToEdit.availableQuantity ??
+        0
+      ),
+      availableFrom: (
+        productToEdit.available_from ??
+        productToEdit.availableFrom ??
+        ''
+      ).slice(0, 10),
+      availableUntil: (
+        productToEdit.available_until ??
+        productToEdit.availableUntil ??
+        ''
+      ).slice(0, 10),
+    }
+  })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -100,8 +147,14 @@ export default function AddProduct({
     setIsSubmitting(true)
 
     try {
-      const response = await fetch(`${API_URL}/products`, {
-        method: 'POST',
+     const isEditing = Boolean(productToEdit)
+
+const response = await fetch(
+  isEditing
+    ? `${API_URL}/products/${productToEdit!.id}`
+    : `${API_URL}/products`,
+  {
+    method: isEditing ? 'PATCH' : 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
@@ -128,7 +181,7 @@ export default function AddProduct({
 
         if (response.status === 403) {
           throw new Error(
-            'Only producers can create product listings.'
+            'Only producers can manage product listings.'
           )
         }
 
@@ -136,7 +189,9 @@ export default function AddProduct({
           .json()
           .catch(() => null)
 
-        let message = 'Unable to create the product. Please try again.'
+        let message = isEditing
+        ? 'Unable to update the product. Please try again.'
+        : 'Unable to create the product. Please try again.'
 
         if (
           typeof responseData === 'object' &&
@@ -185,11 +240,11 @@ export default function AddProduct({
               PRODUCER WORKSPACE / REKOLTA
             </span>
 
-            <h1>Add New Product</h1>
-
+          <h1>{productToEdit ? 'Edit Product' : 'Add New Product'}</h1>
             <p>
-              Create a new agricultural product listing
-              for restaurant customers.
+            {productToEdit
+                ? 'Update your product information for restaurant customers.'
+                : 'Create a new agricultural product listing for restaurant customers.'}
             </p>
           </div>
         </div>
@@ -413,8 +468,12 @@ export default function AddProduct({
               disabled={isSubmitting}
             >
               {isSubmitting
-                ? 'Creating Product...'
-                : 'Create Product'}
+            ? productToEdit
+            ? 'Saving Changes...'
+            : 'Creating Product...'
+            : productToEdit
+            ? 'Save Changes'
+            : 'Create Product'}
             </button>
           </div>
         </form>
