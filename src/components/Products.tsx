@@ -1,103 +1,86 @@
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+
+const API_URL = 'http://localhost:3000'
 
 type Product = {
-  id: number
+  id: string
   name: string
-  category: string
-  price: number
+  description: string | null
+  price: string | number
   unit: string
-  quantity: string
-  producer: string
-  location: string
-  image: string
+  quality: string | null
+  available_quantity?: string | number
+  availableQuantity?: string | number
+ categories?: {
+  id: string
+  name: string
+} | null
+  category_id?: string
 }
-
-const products: Product[] = [
-  {
-    id: 1,
-    name: 'Fresh Tomatoes',
-    category: 'Vegetables',
-    price: 3.5,
-    unit: 'kg',
-    quantity: '150 kg',
-    producer: 'Local Farm',
-    location: 'Plovdiv',
-    image: '/products/tomatoes.jpg',
-  },
-  {
-    id: 2,
-    name: 'Fresh Cucumbers',
-    category: 'Vegetables',
-    price: 2.8,
-    unit: 'kg',
-    quantity: '100 kg',
-    producer: 'Green Valley Farm',
-    location: 'Pazardzhik',
-    image: '/products/cucumbers.jpg',
-  },
-  {
-    id: 3,
-    name: 'Red Apples',
-    category: 'Fruits',
-    price: 2.4,
-    unit: 'kg',
-    quantity: '200 kg',
-    producer: 'Orchard Farm',
-    location: 'Kyustendil',
-    image: '/products/apples.jpg',
-  },
-  {
-    id: 4,
-    name: 'Fresh Potatoes',
-    category: 'Vegetables',
-    price: 1.8,
-    unit: 'kg',
-    quantity: '300 kg',
-    producer: 'Mountain Farm',
-    location: 'Smolyan',
-    image: '/products/potatoes.jpg',
-  },
-  {
-    id: 5,
-    name: 'Fresh Strawberries',
-    category: 'Fruits',
-    price: 6.5,
-    unit: 'kg',
-    quantity: '50 kg',
-    producer: 'Berry Farm',
-    location: 'Stara Zagora',
-    image: '/products/strawberries.jpg',
-  },
-  {
-    id: 6,
-    name: 'Fresh Carrots',
-    category: 'Vegetables',
-    price: 2.2,
-    unit: 'kg',
-    quantity: '120 kg',
-    producer: 'Sunny Fields',
-    location: 'Haskovo',
-    image: '/products/carrots.jpg',
-  },
-]
 
 const categories = ['All Products', 'Vegetables', 'Fruits']
 
 function Products() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All Products')
+  const [products, setProducts] = useState<Product[]>([])
+const [isLoading, setIsLoading] = useState(true)
+const [error, setError] = useState('')
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      product.name.toLowerCase().includes(search.toLowerCase()) ||
-      product.producer.toLowerCase().includes(search.toLowerCase())
+useEffect(() => {
+  const controller = new AbortController()
 
-    const matchesCategory =
-      category === 'All Products' || product.category === category
+  const loadProducts = async () => {
+    setIsLoading(true)
+    setError('')
 
-    return matchesSearch && matchesCategory
-  })
+    try {
+      const response = await fetch(`${API_URL}/products`, {
+        signal: controller.signal,
+      })
+
+      if (!response.ok) {
+        throw new Error('Unable to load products.')
+      }
+
+      const data: Product[] = await response.json()
+
+      if (!controller.signal.aborted) {
+        setProducts(data)
+      }
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : 'Unable to connect to the server.'
+        )
+      }
+    } finally {
+      if (!controller.signal.aborted) {
+        setIsLoading(false)
+      }
+    }
+  }
+
+  void loadProducts()
+
+  return () => controller.abort()
+}, [])
+const filteredProducts = products.filter((product) => {
+  const searchTerm = search.trim().toLowerCase()
+ const categoryName = product.categories?.name ?? ''
+
+  const matchesSearch =
+    product.name.toLowerCase().includes(searchTerm)
+
+  const matchesCategory =
+    category === 'All Products' ||
+    categoryName.toLowerCase() === category.toLowerCase()
+
+  return matchesSearch && matchesCategory
+})
 
   return (
     <main className="products-page">
@@ -131,37 +114,47 @@ function Products() {
         </div>
       </section>
 
+      {isLoading && (
+      <p className="no-products">Loading products...</p>
+        )}
+
+      {error && (
+       <p className="no-products" role="alert">
+        {error}
+       </p>
+       )}
+
       <section className="products-grid">
         {filteredProducts.map((product) => (
           <article className="product-card" key={product.id}>
-            <img
-              src={product.image}
-              alt={product.name}
-              className="product-image"
-            />
+         <div className="product-image product-image-placeholder">
+        <span aria-hidden="true">🌱</span>
+        </div>
 
             <div className="product-info">
-              <span className="product-category">
-                {product.category}
-              </span>
+             <span className="product-category">
+             {product.categories?.name ?? 'Local Produce'}
+            </span>
 
               <h2>{product.name}</h2>
 
               <p className="product-producer">
-                {product.producer}
+                Fresh agricultural produce
               </p>
 
               <p className="product-location">
-                📍 {product.location}
+                📍 Bulgaria
               </p>
 
               <p className="product-quantity">
-                Available: {product.quantity}
+                Available: {Number(
+               product.available_quantity ?? product.availableQuantity ?? 0
+               )} {product.unit}
               </p>
 
               <div className="product-bottom">
                 <span className="product-price">
-                  €{product.price.toFixed(2)}/{product.unit}
+                  €{Number(product.price).toFixed(2)}/{product.unit}
                 </span>
 
                 <button
@@ -179,7 +172,7 @@ function Products() {
         ))}
       </section>
 
-      {filteredProducts.length === 0 && (
+     {!isLoading && !error && filteredProducts.length === 0 && (
         <p className="no-products">
           No products found. Try another search or category.
         </p>
