@@ -1376,3 +1376,26 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 .my-products-edit-button:hover {
   background-color: #1e6029;
 }
+.my-products-delete-button {
+  display: inline-block;
+  margin-top: 12px;
+  margin-left: 10px;
+  padding: 10px 18px;
+  border: 1px solid #c96b6b;
+  border-radius: 10px;
+  background: #fff5f5;
+  color: #a33a3a;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.my-products-delete-button:hover {
+  background: #ffe5e5;
+  transform: translateY(-1px);
+}
+
+.my-products-delete-button:active {
+  transform: translateY(0);
+}

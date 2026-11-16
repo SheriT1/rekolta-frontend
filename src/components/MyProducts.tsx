@@ -32,6 +32,7 @@ export default function MyProducts({ onBack }: MyProductsProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
+  const [deleteError, setDeleteError] = useState('')
   const [showAddProduct, setShowAddProduct] = useState(false)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -97,7 +98,43 @@ const handleProductSaved = () => {
   setEditingProduct(null)
   setRefreshKey((previous) => previous + 1)
 }
+const handleDeleteProduct = async (product: Product) => {
+  const confirmed = window.confirm(
+    `Are you sure you want to delete "${product.name}"? This product will be removed from your listings.`
+  )
 
+  if (!confirmed) return
+
+ setDeleteError('')
+
+  try {
+    const response = await fetch(
+      `${API_URL}/products/${product.id}`,
+      {
+        method: 'DELETE',
+        credentials: 'include',
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error(
+        response.status === 401
+          ? 'Your session has expired. Please log in again.'
+          : response.status === 403
+            ? 'You can only delete your own products.'
+            : 'Unable to delete the product. Please try again.'
+      )
+    }
+
+    setRefreshKey((previous) => previous + 1)
+  } catch (error) {
+   setDeleteError(
+      error instanceof Error
+        ? error.message
+        : 'Unable to connect to the server.'
+    )
+  }
+}
   if (showAddProduct) {
     return (
       <AddProduct
@@ -163,6 +200,12 @@ const handleProductSaved = () => {
           </p>
         )}
 
+        {deleteError && (
+        <p className="my-products-error" role="alert">
+            {deleteError}
+        </p>
+        )}
+        
         {!isLoading && !error && products.length === 0 && (
           <div className="my-products-empty">
             <h2>No products yet</h2>
@@ -253,6 +296,13 @@ const handleProductSaved = () => {
                         onClick={() => setEditingProduct(product)}
                         >
                         Edit Product
+                        </button>
+                        <button
+                        type="button"
+                        className="my-products-delete-button"
+                        onClick={() => void handleDeleteProduct(product)}
+                        >
+                        Delete Product
                         </button>
                  </div>
                   </article>
