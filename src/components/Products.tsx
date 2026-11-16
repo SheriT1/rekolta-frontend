@@ -16,6 +16,10 @@ type Product = {
   id: string
   name: string
 } | null
+producer_profiles?: {
+  business_name: string
+  city: string | null
+} | null
   category_id?: string
 }
 
@@ -138,13 +142,13 @@ const filteredProducts = products.filter((product) => {
 
               <h2>{product.name}</h2>
 
-              <p className="product-producer">
-                Fresh agricultural produce
-              </p>
+            <p className="product-producer">
+            {product.producer_profiles?.business_name ?? 'Local Producer'}
+            </p>
 
-              <p className="product-location">
-                📍 Bulgaria
-              </p>
+            <p className="product-location">
+            📍 {product.producer_profiles?.city || 'Bulgaria'}
+            </p>
 
               <p className="product-quantity">
                 Available: {Number(
