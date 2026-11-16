@@ -101,6 +101,11 @@ function App() {
       setPage('my-products')
     }
   }
+  const handleBrowseProducts = () => {
+  if (currentUser?.role === 'RESTAURANT') {
+    setPage('products')
+  }
+}
 
   return (
     <>
@@ -128,9 +133,9 @@ function App() {
           currentUser={currentUser}
           onLogin={setCurrentUser}
           onManageProducts={handleManageProducts}
+          onBrowseProducts={handleBrowseProducts}
         />
       )}
-
       {page === 'my-products' &&
         currentUser?.role === 'PRODUCER' && (
           <MyProducts onBack={() => setPage('dashboard')} />

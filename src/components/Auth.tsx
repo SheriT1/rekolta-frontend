@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { SubmitEventHandler } from 'react'
 import ProducerDashboard from './ProducerDashboard'
+import RestaurantDashboard from './RestaurantDashboard'
 
 type AuthMode = 'login' | 'register'
 type UserRole = 'PRODUCER' | 'RESTAURANT' | 'ADMIN'
@@ -18,12 +19,14 @@ type AuthProps = {
   currentUser: AuthUser | null
   onLogin: (user: AuthUser) => void
   onManageProducts: () => void
+  onBrowseProducts: () => void
 }
 
 export default function Auth({
   currentUser,
   onLogin,
   onManageProducts,
+  onBrowseProducts,
 }: AuthProps) {
   const [mode, setMode] = useState<AuthMode>('login')
   const [role, setRole] = useState<UserRole>('PRODUCER')
@@ -172,12 +175,14 @@ export default function Auth({
     <main className="auth-page">
       <section
         className={
-          currentUser?.role === 'PRODUCER'
-            ? 'auth-card auth-card--producer'
-            : 'auth-card'
+        currentUser?.role === 'PRODUCER' ||
+        currentUser?.role === 'RESTAURANT'
+          ? 'auth-card auth-card--producer'
+          : 'auth-card'
         }
       >
-        {currentUser?.role !== 'PRODUCER' && (
+    {currentUser?.role !== 'PRODUCER' &&
+    currentUser?.role !== 'RESTAURANT' && (
           <>
             <h1>Rekolta</h1>
             <p>Connecting local producers and restaurants</p>
@@ -186,18 +191,18 @@ export default function Auth({
 
         {currentUser ? (
           <div className="auth-account">
-            {currentUser.role === 'PRODUCER' ? (
-             <ProducerDashboard
-              fullName={currentUser.fullName}
-              onManageProducts={onManageProducts}
+         {currentUser.role === 'PRODUCER' ? (
+          <ProducerDashboard
+                fullName={currentUser.fullName}
+                onManageProducts={onManageProducts}
+              />
+            ) : currentUser.role === 'RESTAURANT' ? (
+              <RestaurantDashboard
+                fullName={currentUser.fullName}
+                onBrowseProducts={onBrowseProducts}
               />
             ) : (
-              <>
-                <h2>Welcome, {currentUser.fullName}!</h2>
-                <p>You are logged in to Rekolta.</p>
-                <p><strong>Email:</strong> {currentUser.email}</p>
-                <p><strong>Account Type:</strong> Restaurant</p>
-              </>
+              <p>Welcome to Rekolta.</p>
             )}
           </div>
         ) : (
