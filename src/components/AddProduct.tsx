@@ -1,7 +1,7 @@
 
 import { useState, type FormEvent } from 'react'
 
-const API_URL = 'http://localhost:3000'
+const API_URL = `http://${window.location.hostname}:3000`
 
 const categories = [
   {
@@ -109,6 +109,7 @@ export default function AddProduct({
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [selectedImages, setSelectedImages] = useState<File[]>([])
 
   const updateField = (
     field: keyof ProductForm,
@@ -119,6 +120,32 @@ export default function AddProduct({
       [field]: value,
     }))
   }
+const handleImageSelection = (
+  event: React.ChangeEvent<HTMLInputElement>
+) => {
+  const files = Array.from(event.target.files ?? [])
+
+  if (files.length > 5) {
+    setError('You can select a maximum of 5 images.')
+    event.target.value = ''
+    return
+  }
+
+  const invalidFile = files.find(
+    (file) =>
+      !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) ||
+      file.size > 5 * 1024 * 1024
+  )
+
+  if (invalidFile) {
+    setError('Images must be JPG, PNG, or WebP and no larger than 5 MB each.')
+    event.target.value = ''
+    return
+  }
+
+  setSelectedImages(files)
+  setError('')
+}
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -210,7 +237,37 @@ const response = await fetch(
         throw new Error(message)
       }
 
-      onProductCreated()
+    if (selectedImages.length > 0) {
+  const savedProduct: { id: string } = isEditing
+    ? { id: productToEdit!.id }
+    : await response.json()
+
+  for (const image of selectedImages) {
+    const imageData = new FormData()
+    imageData.append('image', image)
+
+    const uploadResponse = await fetch(
+      `${API_URL}/products/${savedProduct.id}/images`,
+      {
+        method: 'POST',
+        credentials: 'include',
+        body: imageData,
+      }
+    )
+
+    if (!uploadResponse.ok) {
+      const uploadError = await uploadResponse.json().catch(() => null)
+
+      throw new Error(
+        typeof uploadError?.message === 'string'
+          ? uploadError.message
+          : `Failed to upload ${image.name}.`
+      )
+    }
+  }
+}
+
+onProductCreated()
     } catch (error) {
       setError(
         error instanceof Error
@@ -314,7 +371,35 @@ const response = await fetch(
               </div>
             </div>
           </div>
+<div className="add-product-section">
+  <h2>Product Images</h2>
 
+  <p>
+    Add up to 5 photos of your product.
+    Accepted formats: JPG, PNG, WebP (maximum 5 MB each).
+  </p>
+
+  <div className="add-product-field">
+    <label htmlFor="product-images">
+      Choose Product Images
+    </label>
+
+    <input
+      id="product-images"
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      multiple
+      onChange={handleImageSelection}
+      disabled={isSubmitting}
+    />
+  </div>
+
+  {selectedImages.length > 0 && (
+    <p>
+      {selectedImages.length} image(s) selected
+    </p>
+  )}
+</div>
           <div className="add-product-section">
             <h2>Pricing and Quantity</h2>
 

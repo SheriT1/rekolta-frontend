@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Home from './components/Home'
 import Navbar from './components/Navbar'
 import Products from './components/Products'
+import ProductDetails from './components/ProductDetails'
 import Auth from './components/Auth'
 import MyProducts from './components/MyProducts'
 import './App.css'
@@ -10,6 +11,7 @@ import './App.css'
 type Page =
   | 'home'
   | 'products'
+  | 'product-details'
   | 'auth'
   | 'dashboard'
   | 'my-products'
@@ -25,6 +27,7 @@ const API_URL = 'http://localhost:3000'
 
 function App() {
   const [page, setPage] = useState<Page>('home')
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [logoutError, setLogoutError] = useState('')
@@ -102,10 +105,20 @@ function App() {
     }
   }
   const handleBrowseProducts = () => {
-  if (currentUser?.role === 'RESTAURANT') {
+    if (currentUser?.role === 'RESTAURANT') {
+      setPage('products')
+    }
+  }
+
+  const handleViewProductDetails = (productId: string) => {
+    setSelectedProductId(productId)
+    setPage('product-details')
+  }
+
+  const handleBackToProducts = () => {
+    setSelectedProductId(null)
     setPage('products')
   }
-}
 
   return (
     <>
@@ -126,7 +139,16 @@ function App() {
         <Home onExploreProducts={() => setPage('products')} />
       )}
 
-      {page === 'products' && <Products />}
+       {page === 'products' && (
+        <Products onViewDetails={handleViewProductDetails} />
+      )}
+
+      {page === 'product-details' && selectedProductId && (
+        <ProductDetails
+          productId={selectedProductId}
+          onBack={handleBackToProducts}
+        />
+      )}
 
       {(page === 'auth' || page === 'dashboard') && (
         <Auth

@@ -2,10 +2,16 @@
 import { useEffect, useState } from 'react'
 import AddProduct from './AddProduct'
 
-const API_URL = 'http://localhost:3000'
+const API_URL = `http://${window.location.hostname}:3000`
 
 type Product = {
   id: string
+    product_images?: {
+    id: string
+    image_url: string
+    is_cover: boolean
+    sort_order: number
+  }[]
   name: string
   description: string | null
   price: string | number
@@ -23,6 +29,7 @@ type Product = {
   is_active?: boolean
   is_visible?: boolean
 }
+
 
 type MyProductsProps = {
   onBack: () => void
@@ -239,11 +246,32 @@ const handleDeleteProduct = async (product: Product) => {
                   product.is_visible === false
 
                 return (
-                  <article
-                    className="my-products-card"
-                    key={product.id}
-                  >
-                    <div className="my-products-card-content">
+                 <article
+  className="my-products-card"
+  key={product.id}
+>
+  {product.product_images && product.product_images.length > 0 && (
+    <div className="my-products-card-image">
+      <img
+        src={`${API_URL}${
+          (
+            product.product_images.find((image) => image.is_cover) ??
+            product.product_images[0]
+          ).image_url
+        }`}
+        alt={product.name}
+        style={{
+          width: '100%',
+          height: '220px',
+          objectFit: 'cover',
+          display: 'block',
+          borderRadius: '12px 12px 0 0',
+        }}
+      />
+    </div>
+  )}
+
+  <div className="my-products-card-content">
                       <div className="my-products-card-top">
                         <span className="my-products-card-label">
                           FARM PRODUCT

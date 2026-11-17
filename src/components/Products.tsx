@@ -25,7 +25,11 @@ producer_profiles?: {
 
 const categories = ['All Products', 'Vegetables', 'Fruits']
 
-function Products() {
+type ProductsProps = {
+  onViewDetails: (productId: string) => void
+}
+
+function Products({ onViewDetails }: ProductsProps) {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All Products')
   const [products, setProducts] = useState<Product[]>([])
@@ -161,12 +165,9 @@ const filteredProducts = products.filter((product) => {
                   €{Number(product.price).toFixed(2)}/{product.unit}
                 </span>
 
-                <button
-                  onClick={() =>
-                    alert(
-                      `Product details for ${product.name} are coming soon.`
-                    )
-                  }
+               <button
+                  type="button"
+                  onClick={() => onViewDetails(product.id)}
                 >
                   View Details
                 </button>

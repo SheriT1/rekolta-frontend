@@ -13,7 +13,7 @@ type AuthUser = {
   role: UserRole
 }
 
-const API_URL = 'http://localhost:3000'
+const API_URL = `http://${window.location.hostname}:3000`;
 
 type AuthProps = {
   currentUser: AuthUser | null
