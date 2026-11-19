@@ -247,4 +247,104 @@
   line-height: 1.85;
 }
 
+/* =========================================
+   REKOLTA — CLOSING SECTION
+   Organic green SVG curves
+   ========================================= */
+
+.rk-home-closing {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 560px;
+  padding: 100px 7% 230px;
+  background: var(--home-sage);
+  text-align: center;
+}
+
+.rk-home-closing-inner {
+  position: relative;
+  z-index: 2;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+.rk-home-closing h2 {
+  margin: 18px 0 24px;
+  color: var(--home-forest);
+  font-size: clamp(38px, 5vw, 68px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+}
+
+.rk-home-closing p {
+  max-width: 600px;
+  margin: 0 auto 32px;
+  color: #526357;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.rk-home-closing .rk-home-primary-btn {
+  background: var(--home-forest);
+  color: #ffffff;
+}
+
+/* Three overlapping organic curves */
+
+.rk-home-closing-waves {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+}
+
+.rk-home-closing-waves svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* =========================================
+   REKOLTA — HOMEPAGE FOOTER
+   ========================================= */
+
+.rk-home-footer {
+  padding: 34px 7%;
+  background: var(--home-forest);
+  color: #ffffff;
+}
+
+.rk-home-footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.rk-home-footer p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.rk-home-footer a {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.rk-home-footer a:hover {
+  text-decoration: underline;
+}
+
+
 
