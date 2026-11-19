@@ -37,3 +37,123 @@
   letter-spacing: 2.5px;
   line-height: 1.7;
 }
+
+/* =========================================
+   REKOLTA — HERO SECTION
+   ========================================= */
+
+.rk-home-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 48px;
+  min-height: 620px;
+  padding: 80px 7%;
+  background: var(--home-cream);
+}
+
+.rk-home-hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+}
+
+.rk-home-hero h1 {
+  margin: 20px 0 24px;
+  color: var(--home-forest);
+  font-size: clamp(44px, 5vw, 76px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -2px;
+}
+
+.rk-home-hero p {
+  max-width: 470px;
+  margin: 0 0 32px;
+  color: #526357;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.rk-home-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.rk-home-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 999px;
+  background: var(--home-forest);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.rk-home-primary-btn:hover {
+  background: var(--home-green);
+  transform: translateY(-2px);
+}
+
+.rk-home-secondary-link {
+  color: var(--home-forest);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.rk-home-secondary-link:hover {
+  text-decoration: underline;
+}
+
+/* Hero photograph */
+
+.rk-home-hero-visual {
+  position: relative;
+  min-width: 0;
+}
+
+.rk-home-hero-photo {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 500px;
+  border-radius: 220px 220px 24px 24px;
+  background: var(--home-sage);
+}
+
+.rk-home-hero-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Decorative SVG curve */
+
+.rk-home-photo-curve {
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.rk-home-label-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--home-green);
+}
+
