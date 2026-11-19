@@ -1,0 +1,39 @@
+
+/* =========================================
+   REKOLTA — HOMEPAGE
+   Base styles and color palette
+   ========================================= */
+
+.rk-home {
+  --home-forest: #18482f;
+  --home-green: #277d3b;
+  --home-sage: #e3ecd9;
+  --home-light: #b8d59f;
+  --home-cream: #fafbf5;
+
+  width: 100%;
+  overflow: hidden;
+  background: var(--home-cream);
+  color: var(--home-forest);
+}
+
+.rk-home *,
+.rk-home *::before,
+.rk-home *::after {
+  box-sizing: border-box;
+}
+
+.rk-home button,
+.rk-home a {
+  font: inherit;
+}
+
+.rk-home-eyebrow {
+  display: inline-block;
+  color: var(--home-green);
+  font-family: Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  line-height: 1.7;
+}
