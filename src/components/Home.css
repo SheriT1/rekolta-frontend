@@ -1,7 +1,6 @@
 
 /* =========================================
    REKOLTA — HOMEPAGE
-   Base styles and color palette
    ========================================= */
 
 .rk-home {
@@ -29,49 +28,61 @@
 }
 
 .rk-home-eyebrow {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   color: var(--home-green);
   font-family: Arial, sans-serif;
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 2.5px;
+  letter-spacing: 2.2px;
   line-height: 1.7;
 }
 
 /* =========================================
-   REKOLTA — HERO SECTION
+   HERO SECTION
    ========================================= */
 
 .rk-home-hero {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 46%) minmax(0, 54%);
   align-items: center;
-  gap: 48px;
-  min-height: 620px;
-  padding: 80px 7%;
-  background: var(--home-cream);
+  gap: 0;
+
+  width: 100%;
+  min-height: 680px;
+  margin: 0;
+
+  /* No right padding: image reaches page edge */
+  padding: 0 0 55px 6%;
 }
 
 .rk-home-hero-copy {
   position: relative;
   z-index: 2;
-  max-width: 600px;
+  max-width: 650px;
+  padding-right: 25px;
 }
 
 .rk-home-hero h1 {
-  margin: 20px 0 24px;
+  margin: 26px 0;
   color: var(--home-forest);
-  font-size: clamp(44px, 5vw, 76px);
-  font-weight: 700;
-  line-height: 1.08;
-  letter-spacing: -2px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(49px, 5.3vw, 83px);
+  font-weight: 500;
+  letter-spacing: -3px;
+  line-height: 1.06;
 }
 
-.rk-home-hero p {
-  max-width: 470px;
-  margin: 0 0 32px;
-  color: #526357;
+.rk-home-hero h1 em {
+  color: #6d8e58;
+  font-weight: 400;
+}
+
+.rk-home-hero-copy > p {
+  max-width: 480px;
+  margin: 0;
+  color: #4b6250;
   font-size: 17px;
   line-height: 1.8;
 }
@@ -80,21 +91,22 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
+  margin-top: 32px;
 }
 
 .rk-home-primary-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 50px;
-  padding: 14px 28px;
+  gap: 20px;
+  min-height: 52px;
+  padding: 14px 26px;
   border: none;
   border-radius: 999px;
   background: var(--home-forest);
   color: #fff;
   font-weight: 600;
-  text-decoration: none;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
 }
@@ -114,105 +126,153 @@
   text-decoration: underline;
 }
 
-/* Hero photograph */
-
-.rk-home-hero-visual {
-  position: relative;
-  min-width: 0;
+.rk-home-primary-btn:focus-visible,
+.rk-home-secondary-link:focus-visible {
+  outline: 3px solid var(--home-green);
+  outline-offset: 4px;
 }
 
-.rk-home-hero-photo {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  height: 500px;
-  border-radius: 220px 220px 24px 24px;
-  background: var(--home-sage);
+.rk-home-small-note {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 65px;
+  color: #789071;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.7px;
 }
 
-.rk-home-hero-photo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Decorative SVG curve */
-
-.rk-home-photo-curve {
-  position: absolute;
-  right: 0;
-  bottom: -1px;
-  left: 0;
-  width: 100%;
-  height: auto;
-  pointer-events: none;
-}
-
-.rk-home-label-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--home-green);
+.rk-home-small-note-line {
+  flex: 0 0 30px;
+  height: 1px;
+  background: #9cb494;
 }
 
 /* =========================================
-   REKOLTA — EDITORIAL STORY SECTION
+   LARGE HERO IMAGE
+   ========================================= */
+
+.rk-home-hero-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-self: stretch;
+
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.rk-home-hero-art {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+}
+
+.rk-home-visual-caption {
+  align-self: flex-end;
+  margin: 8px 3% 0 0;
+  color: #789071;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+}
+
+/* =========================================
+   EDITORIAL STORY SECTION
    ========================================= */
 
 .rk-home-statement {
-  position: relative;
-  padding: 110px 7% 120px;
-  background: var(--home-cream);
-}
-
-.rk-home-statement-inner {
-  max-width: 1280px;
+  max-width: 1500px;
   margin: 0 auto;
+  padding: 95px 7% 110px;
 }
 
-.rk-home-statement-heading {
-  max-width: 760px;
-  margin: 0 auto 70px;
-  text-align: center;
+.rk-home-statement-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #cfdec5;
 }
 
-.rk-home-statement-heading h2 {
-  margin: 16px 0 24px;
-  color: var(--home-forest);
-  font-size: clamp(36px, 4.5vw, 62px);
+.rk-home-statement-index {
+  color: #789071;
+  font-size: 11px;
   font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -1.5px;
+  letter-spacing: 1.5px;
 }
 
-.rk-home-statement-heading p {
-  max-width: 620px;
-  margin: 0 auto;
-  color: #526357;
-  font-size: 17px;
-  line-height: 1.85;
-}
-
-/* Farmer and chef story layout */
-
-.rk-home-story-grid {
+.rk-home-statement-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 36px;
-  align-items: start;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: end;
+  gap: 70px;
+  padding: 55px 0 65px;
 }
 
-.rk-home-story-card {
-  min-width: 0;
+.rk-home-statement h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(52px, 6vw, 90px);
+  font-weight: 500;
+  letter-spacing: -3px;
+  line-height: 1.05;
+}
+
+.rk-home-statement h2 em {
+  color: #6d8e58;
+  font-weight: 400;
+}
+
+.rk-home-statement-text {
+  max-width: 440px;
+  padding-bottom: 8px;
+}
+
+.rk-home-statement-text p {
+  margin: 0 0 20px;
+  color: #4b6250;
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.rk-home-statement-text p:first-child {
+  color: var(--home-forest);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  line-height: 1.4;
+}
+
+.rk-home-story-images {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 24px;
 }
 
 .rk-home-story-image {
+  position: relative;
+  min-width: 0;
   overflow: hidden;
-  height: 380px;
   border-radius: 24px;
   background: var(--home-sage);
+}
+
+.rk-home-story-image--farmer {
+  height: 420px;
+}
+
+.rk-home-story-image--chef {
+  height: 350px;
+  margin-top: 70px;
 }
 
 .rk-home-story-image img {
@@ -223,339 +283,276 @@
   transition: transform 0.5s ease;
 }
 
-.rk-home-story-card:hover .rk-home-story-image img {
+.rk-home-story-image:hover img {
   transform: scale(1.04);
 }
 
-.rk-home-story-content {
-  padding: 28px 8px 0;
-}
-
-.rk-home-story-content h3 {
-  margin: 12px 0 14px;
+.rk-home-story-image > span {
+  position: absolute;
+  bottom: 20px;
+  left: 22px;
+  max-width: calc(100% - 44px);
+  padding: 12px 17px;
+  border-radius: 100px;
+  background: rgba(250, 251, 245, 0.96);
   color: var(--home-forest);
-  font-size: clamp(24px, 2.5vw, 34px);
+  font-size: 11px;
   font-weight: 700;
-  line-height: 1.2;
-}
-
-.rk-home-story-content p {
-  max-width: 520px;
-  margin: 0;
-  color: #526357;
-  font-size: 16px;
-  line-height: 1.85;
+  letter-spacing: 1.3px;
 }
 
 /* =========================================
-   REKOLTA — CLOSING SECTION
-   Organic green SVG curves
+   CLOSING SECTION
    ========================================= */
 
 .rk-home-closing {
   position: relative;
   isolation: isolate;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 660px;
   overflow: hidden;
-  min-height: 560px;
-  padding: 100px 7% 230px;
   background: var(--home-sage);
   text-align: center;
 }
 
-.rk-home-closing-inner {
+.rk-home-closing-content {
   position: relative;
   z-index: 2;
-  max-width: 850px;
-  margin: 0 auto;
+  width: min(100% - 40px, 800px);
+  padding: 90px 0 240px;
 }
 
 .rk-home-closing h2 {
-  margin: 18px 0 24px;
-  color: var(--home-forest);
-  font-size: clamp(38px, 5vw, 68px);
-  font-weight: 700;
-  line-height: 1.12;
-  letter-spacing: -1.5px;
+  margin: 24px 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(48px, 6vw, 86px);
+  font-weight: 500;
+  letter-spacing: -3px;
+  line-height: 1.05;
 }
 
-.rk-home-closing p {
-  max-width: 600px;
-  margin: 0 auto 32px;
-  color: #526357;
-  font-size: 17px;
-  line-height: 1.8;
+.rk-home-closing h2 em {
+  color: #63844e;
+  font-weight: 400;
 }
 
-.rk-home-closing .rk-home-primary-btn {
-  background: var(--home-forest);
-  color: #ffffff;
+.rk-home-closing-content > p {
+  max-width: 510px;
+  margin: 0 auto 30px;
+  color: #48624e;
+  font-size: 18px;
+  line-height: 1.7;
 }
 
-/* Three overlapping organic curves */
-
-.rk-home-closing-waves {
+.rk-home-closing-curve {
   position: absolute;
-  right: 0;
+  z-index: 1;
   bottom: -1px;
   left: 0;
-  z-index: 1;
-  width: 100%;
-  height: auto;
   display: block;
+  width: 100%;
+  height: clamp(180px, 22vw, 300px);
   pointer-events: none;
 }
 
-.rk-home-closing-waves svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
 /* =========================================
-   REKOLTA — HOMEPAGE FOOTER
+   FOOTER
    ========================================= */
 
 .rk-home-footer {
-  padding: 34px 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 30px 7%;
   background: var(--home-forest);
-  color: #ffffff;
+  color: var(--home-sage);
 }
 
-.rk-home-footer-inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 24px;
-  max-width: 1280px;
-  margin: 0 auto;
+.rk-home-footer-brand {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.rk-home-footer-tagline {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
 }
 
 .rk-home-footer p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.rk-home-footer a {
-  color: #ffffff;
-  text-decoration: none;
-}
-
-.rk-home-footer a:hover {
-  text-decoration: underline;
+  font-size: 14px;
 }
 
 /* =========================================
-   REKOLTA — RESPONSIVE HOMEPAGE
+   TABLET
    ========================================= */
-
-/* Smaller desktops and tablets */
 
 @media (max-width: 1050px) {
   .rk-home-hero {
-    gap: 32px;
-    min-height: 540px;
-    padding: 70px 5%;
+    grid-template-columns: minmax(0, 46%) minmax(0, 54%);
+    min-height: 580px;
+    padding: 0 0 45px 5%;
   }
 
   .rk-home-hero h1 {
-    font-size: clamp(40px, 5vw, 60px);
+    font-size: clamp(42px, 5.2vw, 65px);
+    letter-spacing: -2px;
   }
 
-  .rk-home-hero-photo {
-    height: 430px;
-    border-radius: 180px 180px 24px 24px;
-  }
-
-  .rk-home-statement {
-    padding: 90px 5%;
-  }
-
-  .rk-home-story-grid {
-    gap: 24px;
-  }
-
-  .rk-home-story-image {
-    height: 320px;
-  }
-
-  .rk-home-closing {
-    min-height: 500px;
-    padding: 85px 5% 200px;
+  .rk-home-statement-grid {
+    gap: 35px;
   }
 }
 
-/* Tablets and mobile phones */
+/* =========================================
+   MOBILE
+   ========================================= */
 
 @media (max-width: 760px) {
   .rk-home-hero {
     grid-template-columns: 1fr;
-    gap: 42px;
-    min-height: auto;
-    padding: 65px 6% 75px;
+    min-height: 0;
+    padding: 55px 0 45px 5%;
   }
 
   .rk-home-hero-copy {
-    max-width: 620px;
+    padding-right: 5%;
   }
 
   .rk-home-hero h1 {
-    font-size: clamp(40px, 8vw, 58px);
-    letter-spacing: -1.5px;
-  }
-
-  .rk-home-hero p {
-    font-size: 16px;
+    font-size: clamp(43px, 9vw, 66px);
+    letter-spacing: -2px;
   }
 
   .rk-home-hero-visual {
     width: 100%;
-    max-width: 560px;
-    margin: 0 auto;
+    margin-top: 30px;
   }
 
-  .rk-home-hero-photo {
-    height: 400px;
-    border-radius: 180px 180px 20px 20px;
+  .rk-home-hero-art {
+    width: 100%;
+    height: auto;
+    max-height: none;
   }
 
   .rk-home-statement {
-    padding: 75px 6% 90px;
+    padding: 65px 7% 75px;
   }
 
-  .rk-home-statement-heading {
-    margin-bottom: 44px;
-  }
-
-  .rk-home-statement-heading h2 {
-    font-size: clamp(34px, 7vw, 48px);
-  }
-
-  .rk-home-story-grid {
+  .rk-home-statement-grid {
     grid-template-columns: 1fr;
-    gap: 48px;
+    gap: 25px;
+    padding: 38px 0 42px;
   }
 
-  .rk-home-story-image {
-    height: 360px;
+  .rk-home-statement h2 {
+    font-size: clamp(49px, 9vw, 70px);
+  }
+
+  .rk-home-statement-text p {
+    font-size: 16px;
+  }
+
+  .rk-home-story-images {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .rk-home-story-image--farmer {
+    height: 300px;
+  }
+
+  .rk-home-story-image--chef {
+    height: 250px;
+    margin-top: 50px;
   }
 
   .rk-home-closing {
-    min-height: 470px;
-    padding: 80px 6% 175px;
+    min-height: 610px;
+  }
+
+  .rk-home-closing-content {
+    padding: 75px 0 230px;
   }
 
   .rk-home-closing h2 {
-    font-size: clamp(36px, 7vw, 52px);
+    font-size: clamp(44px, 8vw, 65px);
   }
 
-  .rk-home-footer-inner {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
+  .rk-home-closing-curve {
+    height: 190px;
   }
 }
 
-/* Small mobile phones */
+/* =========================================
+   SMALL MOBILE
+   ========================================= */
 
 @media (max-width: 480px) {
-  .rk-home-hero {
-    gap: 34px;
-    padding: 50px 5% 65px;
-  }
-
   .rk-home-eyebrow {
     font-size: 10px;
-    letter-spacing: 2px;
+    letter-spacing: 1.7px;
   }
 
   .rk-home-hero h1 {
-    margin: 16px 0 20px;
-    font-size: clamp(36px, 10vw, 46px);
-    letter-spacing: -1.2px;
-  }
-
-  .rk-home-hero p {
-    margin-bottom: 26px;
-    font-size: 15px;
-    line-height: 1.7;
-  }
-
-  .rk-home-hero-actions {
-    gap: 18px;
+    font-size: clamp(39px, 10vw, 50px);
   }
 
   .rk-home-primary-btn {
-    min-height: 48px;
-    padding: 12px 24px;
+    width: 100%;
   }
 
-  .rk-home-hero-photo {
-    height: 310px;
-    border-radius: 145px 145px 18px 18px;
+  .rk-home-small-note {
+    margin-top: 40px;
   }
 
-  .rk-home-statement {
-    padding: 65px 5% 75px;
+  .rk-home-story-images {
+    grid-template-columns: 1fr;
   }
 
-  .rk-home-statement-heading h2 {
-    font-size: 36px;
+  .rk-home-story-image--farmer,
+  .rk-home-story-image--chef {
+    height: 280px;
+    margin-top: 0;
   }
 
-  .rk-home-statement-heading p {
-    font-size: 15px;
-  }
-
-  .rk-home-story-image {
-    height: 260px;
-    border-radius: 18px;
-  }
-
-  .rk-home-story-content {
-    padding: 22px 2px 0;
-  }
-
-  .rk-home-story-content h3 {
-    font-size: 26px;
-  }
-
-  .rk-home-story-content p {
-    font-size: 15px;
-  }
-
-  .rk-home-closing {
-    min-height: 430px;
-    padding: 70px 5% 145px;
+  .rk-home-closing-content {
+    padding-top: 65px;
   }
 
   .rk-home-closing h2 {
-    font-size: 38px;
+    font-size: 43px;
+    letter-spacing: -1.5px;
   }
 
-  .rk-home-closing p {
-    font-size: 15px;
+  .rk-home-closing-content > p {
+    font-size: 16px;
+  }
+
+  .rk-home-closing-curve {
+    height: 160px;
   }
 
   .rk-home-footer {
-    padding: 28px 5%;
+    justify-content: center;
+    text-align: center;
   }
 }
 
-/* Accessibility: respect reduced-motion preferences */
+/* =========================================
+   ACCESSIBILITY
+   ========================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  .rk-home-primary-btn,
-  .rk-home-story-image img {
-    transition: none;
-  }
-
-  .rk-home-primary-btn:hover,
-  .rk-home-story-card:hover .rk-home-story-image img {
-    transform: none;
+  .rk-home *,
+  .rk-home *::before,
+  .rk-home *::after {
+    transition: none !important;
   }
 }
-
-
-
