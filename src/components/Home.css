@@ -157,3 +157,94 @@
   background: var(--home-green);
 }
 
+/* =========================================
+   REKOLTA — EDITORIAL STORY SECTION
+   ========================================= */
+
+.rk-home-statement {
+  position: relative;
+  padding: 110px 7% 120px;
+  background: var(--home-cream);
+}
+
+.rk-home-statement-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.rk-home-statement-heading {
+  max-width: 760px;
+  margin: 0 auto 70px;
+  text-align: center;
+}
+
+.rk-home-statement-heading h2 {
+  margin: 16px 0 24px;
+  color: var(--home-forest);
+  font-size: clamp(36px, 4.5vw, 62px);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: -1.5px;
+}
+
+.rk-home-statement-heading p {
+  max-width: 620px;
+  margin: 0 auto;
+  color: #526357;
+  font-size: 17px;
+  line-height: 1.85;
+}
+
+/* Farmer and chef story layout */
+
+.rk-home-story-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 36px;
+  align-items: start;
+}
+
+.rk-home-story-card {
+  min-width: 0;
+}
+
+.rk-home-story-image {
+  overflow: hidden;
+  height: 380px;
+  border-radius: 24px;
+  background: var(--home-sage);
+}
+
+.rk-home-story-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.rk-home-story-card:hover .rk-home-story-image img {
+  transform: scale(1.04);
+}
+
+.rk-home-story-content {
+  padding: 28px 8px 0;
+}
+
+.rk-home-story-content h3 {
+  margin: 12px 0 14px;
+  color: var(--home-forest);
+  font-size: clamp(24px, 2.5vw, 34px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.rk-home-story-content p {
+  max-width: 520px;
+  margin: 0;
+  color: #526357;
+  font-size: 16px;
+  line-height: 1.85;
+}
+
+
