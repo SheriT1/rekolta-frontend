@@ -32,6 +32,7 @@ type Product = {
 type ProductDetailsProps = {
   productId: string
   onBack: () => void
+  isRestaurant: boolean
 }
 
 const getImageUrl = (path: string) => {
@@ -39,11 +40,21 @@ const getImageUrl = (path: string) => {
   return `${API_URL}${path.startsWith('/') ? '' : '/'}${path}`
 }
 
-function ProductDetails({ productId, onBack }: ProductDetailsProps) {
+
+function ProductDetails({
+  productId,
+  onBack,
+  isRestaurant,
+}: ProductDetailsProps) {
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [activeImageIndex, setActiveImageIndex] = useState(0)
+  const [requestedQuantity, setRequestedQuantity] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [requestError, setRequestError] = useState('')
+  const [requestSuccess, setRequestSuccess] = useState('')
+
 
   useEffect(() => {
     const controller = new AbortController()
@@ -104,6 +115,75 @@ function ProductDetails({ productId, onBack }: ProductDetailsProps) {
   function formatDate(value?: string | null) {
     return value ? value.slice(0, 10) : 'Not specified'
   }
+
+async function handleSubmitRequest() {
+  if (!product || !isRestaurant || isSubmitting) return
+
+  setRequestError('')
+  setRequestSuccess('')
+
+  const quantity = Number(requestedQuantity)
+  const availableQuantity = Number(
+    product.available_quantity ?? product.availableQuantity ?? 0
+  )
+
+  if (
+    !requestedQuantity.trim() ||
+    !Number.isFinite(quantity) ||
+    quantity <= 0 ||
+    !/^\d+(\.\d{1,2})?$/.test(requestedQuantity.trim())
+  ) {
+    setRequestError('Please enter a valid quantity greater than zero.')
+    return
+  }
+
+  if (quantity > availableQuantity) {
+    setRequestError(
+      `You can request a maximum of ${availableQuantity} ${product.unit}.`
+    )
+    return
+  }
+
+  setIsSubmitting(true)
+
+  try {
+    const response = await fetch(`${API_URL}/purchase-requests`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        productListingId: product.id,
+        requestedQuantity: quantity,
+      }),
+    })
+
+    if (!response.ok) {
+      const result = await response.json().catch(() => null)
+
+      const message = result?.message
+      throw new Error(
+        Array.isArray(message)
+          ? message.join(', ')
+          : typeof message === 'string'
+            ? message
+            : 'Unable to submit your purchase request.'
+      )
+    }
+
+    setRequestSuccess('Your purchase request was submitted successfully!')
+    setRequestedQuantity('')
+  } catch (error) {
+    setRequestError(
+      error instanceof Error
+        ? error.message
+        : 'Unable to connect to the server.'
+    )
+  } finally {
+    setIsSubmitting(false)
+  }
+}
 
   return (
     <main className="rk-detail-page">
@@ -295,10 +375,69 @@ function ProductDetails({ productId, onBack }: ProductDetailsProps) {
                   {product.producer_profiles?.city || 'Bulgaria'}
                 </p>
 
-                <div className="rk-detail-producer-note">
-                  Purchase requests will be available to registered
-                  restaurant owners.
-                </div>
+               
+{isRestaurant ? (
+  <div className="rk-detail-producer-note">
+    <h3>Request This Product</h3>
+
+    <p>Enter the quantity you would like to purchase.</p>
+
+    <form
+      onSubmit={(event) => {
+        event.preventDefault()
+        void handleSubmitRequest()
+      }}
+    >
+      <label htmlFor="requested-quantity">
+        Quantity ({product.unit})
+      </label>
+
+      <input
+        id="requested-quantity"
+        type="number"
+        min="0.01"
+        max={Number(
+          product.available_quantity ??
+            product.availableQuantity ??
+            0
+        )}
+        step="0.01"
+        value={requestedQuantity}
+        onChange={(event) => {
+          setRequestedQuantity(event.target.value)
+          setRequestError('')
+          setRequestSuccess('')
+        }}
+        placeholder="Enter quantity"
+        required
+        disabled={isSubmitting}
+      />
+
+      <button
+        type="submit"
+        disabled={isSubmitting}
+      >
+        {isSubmitting
+          ? 'Sending Request...'
+          : 'Send Purchase Request'}
+      </button>
+    </form>
+
+    {requestError && (
+      <p role="alert">{requestError}</p>
+    )}
+
+    {requestSuccess && (
+      <p role="status">{requestSuccess}</p>
+    )}
+  </div>
+) : (
+  <div className="rk-detail-producer-note">
+    Purchase requests are available to registered
+    restaurant owners.
+  </div>
+)}
+
               </div>
             </aside>
           </div>
