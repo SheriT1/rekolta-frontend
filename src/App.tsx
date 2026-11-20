@@ -143,12 +143,14 @@ function App() {
         <Products onViewDetails={handleViewProductDetails} />
       )}
 
-      {page === 'product-details' && selectedProductId && (
-        <ProductDetails
-          productId={selectedProductId}
-          onBack={handleBackToProducts}
-        />
-      )}
+      
+    {page === 'product-details' && selectedProductId && (
+    <ProductDetails
+    productId={selectedProductId}
+    onBack={handleBackToProducts}
+    isRestaurant={currentUser?.role === 'RESTAURANT'}
+    />
+    )}
 
       {(page === 'auth' || page === 'dashboard') && (
         <Auth
