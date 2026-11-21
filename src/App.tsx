@@ -6,6 +6,7 @@ import Products from './components/Products'
 import ProductDetails from './components/ProductDetails'
 import Auth from './components/Auth'
 import MyProducts from './components/MyProducts'
+import MyOrders from './components/MyOrders'
 import './App.css'
 
 type Page =
@@ -15,6 +16,7 @@ type Page =
   | 'auth'
   | 'dashboard'
   | 'my-products'
+  | 'my-orders'
 
 type AuthUser = {
   id: string
@@ -158,12 +160,20 @@ function App() {
           onLogin={setCurrentUser}
           onManageProducts={handleManageProducts}
           onBrowseProducts={handleBrowseProducts}
+          onViewAllRequests={() => setPage('my-orders')}
         />
       )}
       {page === 'my-products' &&
         currentUser?.role === 'PRODUCER' && (
           <MyProducts onBack={() => setPage('dashboard')} />
         )}
+        {page === 'my-orders' &&
+  currentUser?.role === 'RESTAURANT' && (
+    <MyOrders
+      onBack={() => setPage('dashboard')}
+      onBrowseProducts={handleBrowseProducts}
+    />
+  )}
     </>
   )
 }

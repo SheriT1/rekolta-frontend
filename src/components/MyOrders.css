@@ -1,0 +1,46 @@
+.my-orders-page {
+  width: min(1180px, calc(100% - 40px));
+  margin: 44px auto 80px;
+}
+.my-orders-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.my-orders-eyebrow {
+  color: #527454;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+.my-orders-heading h1 {
+  color: #174b2d;
+  font-family: Georgia, serif;
+  font-size: clamp(32px, 4vw, 48px);
+  margin: 10px 0;
+}
+.my-orders-heading p { color: #58705e; margin: 0; }
+.my-orders-back {
+  background: #174b2d;
+  color: white;
+  border: 0;
+  border-radius: 999px;
+  padding: 13px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.my-orders-back:hover { background: #276c43; }
+.my-orders-card { width: 100%; }
+.my-orders-card .restaurant-requests-header h2 {
+  font-size: inherit;
+  font-weight: inherit;
+  margin: 0;
+}
+.my-orders-card .restaurant-requests-header > span { color: #fff; }
+@media (max-width: 640px) {
+  .my-orders-page { width: calc(100% - 24px); margin-top: 24px; }
+  .my-orders-heading { align-items: flex-start; flex-direction: column; }
+}

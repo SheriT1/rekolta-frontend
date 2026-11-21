@@ -20,6 +20,7 @@ type AuthProps = {
   onLogin: (user: AuthUser) => void
   onManageProducts: () => void
   onBrowseProducts: () => void
+  onViewAllRequests: () => void
 }
 
 export default function Auth({
@@ -27,6 +28,7 @@ export default function Auth({
   onLogin,
   onManageProducts,
   onBrowseProducts,
+  onViewAllRequests,
 }: AuthProps) {
   const [mode, setMode] = useState<AuthMode>('login')
   const [role, setRole] = useState<UserRole>('PRODUCER')
@@ -197,9 +199,10 @@ export default function Auth({
                 onManageProducts={onManageProducts}
               />
             ) : currentUser.role === 'RESTAURANT' ? (
-              <RestaurantDashboard
-                fullName={currentUser.fullName}
-                onBrowseProducts={onBrowseProducts}
+            <RestaurantDashboard
+             fullName={currentUser.fullName}
+             onBrowseProducts={onBrowseProducts}
+             onViewAllRequests={onViewAllRequests}
               />
             ) : (
               <p>Welcome to Rekolta.</p>
