@@ -346,6 +346,63 @@ async function handleSubmitRequest() {
                   </div>
                 </section>
               </div>
+
+              {isRestaurant ? (
+                <section className="rk-order-panel" aria-labelledby="rk-order-title">
+                  <div className="rk-order-intro">
+                    <h2 id="rk-order-title">Request This Product</h2>
+                    <p>
+                      Enter the quantity you would like to purchase and send a
+                      request directly to the producer.
+                    </p>
+                  </div>
+                  <div className="rk-order-controls">
+                    <form
+                      onSubmit={(event) => {
+                        event.preventDefault()
+                        void handleSubmitRequest()
+                      }}
+                    >
+                      <label htmlFor="requested-quantity">
+                        Quantity ({product.unit})
+                      </label>
+                      <input
+                        id="requested-quantity"
+                        type="text"
+                        inputMode="decimal"
+                        autoComplete="off"
+                        value={requestedQuantity}
+                        onChange={(event) => {
+                          setRequestedQuantity(event.target.value)
+                          setRequestError('')
+                          setRequestSuccess('')
+                        }}
+                        placeholder="e.g. 10"
+                        required
+                        disabled={isSubmitting}
+                        aria-describedby={requestError ? 'rk-order-error' : undefined}
+                      />
+                      <button type="submit" disabled={isSubmitting}>
+                        {isSubmitting ? 'Sending Request...' : 'Send Purchase Request'}
+                      </button>
+                    </form>
+                    {requestError && (
+                      <p className="rk-order-feedback rk-order-error" id="rk-order-error" role="alert">
+                        {requestError}
+                      </p>
+                    )}
+                    {requestSuccess && (
+                      <p className="rk-order-feedback rk-order-success" role="status">
+                        {requestSuccess}
+                      </p>
+                    )}
+                  </div>
+                </section>
+              ) : (
+                <p className="rk-order-guest-note">
+                  Purchase requests are available to registered restaurant owners.
+                </p>
+              )}
             </div>
 
             <aside className="rk-detail-producer">
@@ -358,13 +415,6 @@ async function handleSubmitRequest() {
               <div className="rk-detail-producer-content">
                 <h2>About the Producer</h2>
 
-                <div
-                  className="rk-detail-farm-avatar"
-                  aria-hidden="true"
-                >
-                  <span>R</span>
-                </div>
-
                 <h3>
                   {product.producer_profiles?.business_name ??
                     'Local Producer'}
@@ -376,67 +426,6 @@ async function handleSubmitRequest() {
                 </p>
 
                
-{isRestaurant ? (
-  <div className="rk-detail-producer-note">
-    <h3>Request This Product</h3>
-
-    <p>Enter the quantity you would like to purchase.</p>
-
-    <form
-      onSubmit={(event) => {
-        event.preventDefault()
-        void handleSubmitRequest()
-      }}
-    >
-      <label htmlFor="requested-quantity">
-        Quantity ({product.unit})
-      </label>
-
-      <input
-        id="requested-quantity"
-        type="number"
-        min="0.01"
-        max={Number(
-          product.available_quantity ??
-            product.availableQuantity ??
-            0
-        )}
-        step="0.01"
-        value={requestedQuantity}
-        onChange={(event) => {
-          setRequestedQuantity(event.target.value)
-          setRequestError('')
-          setRequestSuccess('')
-        }}
-        placeholder="Enter quantity"
-        required
-        disabled={isSubmitting}
-      />
-
-      <button
-        type="submit"
-        disabled={isSubmitting}
-      >
-        {isSubmitting
-          ? 'Sending Request...'
-          : 'Send Purchase Request'}
-      </button>
-    </form>
-
-    {requestError && (
-      <p role="alert">{requestError}</p>
-    )}
-
-    {requestSuccess && (
-      <p role="status">{requestSuccess}</p>
-    )}
-  </div>
-) : (
-  <div className="rk-detail-producer-note">
-    Purchase requests are available to registered
-    restaurant owners.
-  </div>
-)}
 
               </div>
             </aside>
