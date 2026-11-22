@@ -2,6 +2,7 @@
 type ProducerDashboardProps = {
   fullName: string
   onManageProducts: () => void
+  onViewOrders: () => void
 }
 
 const dashboardSections = [
@@ -34,6 +35,7 @@ const dashboardSections = [
 export default function ProducerDashboard({
   fullName,
   onManageProducts,
+  onViewOrders,
 }: ProducerDashboardProps) {
   const firstName = fullName.trim().split(/\s+/)[0] || 'Producer'
 
@@ -85,21 +87,27 @@ export default function ProducerDashboard({
               <h3>{section.title}</h3>
               <p>{section.description}</p>
 
-              {section.title === 'My Products' ? (
-                <button
-                  type="button"
-                  className="producer-card-action"
-                  onClick={onManageProducts}
-                >
-                  {section.action}
-                  <span aria-hidden="true"> →</span>
-                </button>
-              ) : (
-                <span className="producer-card-action">
-                  {section.action}
-                  <span aria-hidden="true"> →</span>
-                </span>
-              )}
+           
+            {section.title === 'My Products' || section.title === 'Incoming Orders' ? (
+          <button
+            type="button"
+            className="producer-card-action"
+            onClick={
+            section.title === 'My Products'
+             ? onManageProducts
+             : onViewOrders
+                    }
+              >
+             {section.action}
+             <span aria-hidden="true"> →</span>
+            </button>
+                ) : (
+            <span className="producer-card-action">
+           {section.action}
+           <span aria-hidden="true"> →</span>
+            </span>
+            )}
+
             </div>
           </article>
         ))}

@@ -17,6 +17,7 @@ type Page =
   | 'dashboard'
   | 'my-products'
   | 'my-orders'
+  | 'incoming-orders'
 
 type AuthUser = {
   id: string
@@ -106,6 +107,11 @@ function App() {
       setPage('my-products')
     }
   }
+  const handleViewIncomingOrders = () => {
+  if (currentUser?.role === 'PRODUCER') {
+    setPage('incoming-orders')
+  }
+}
   const handleBrowseProducts = () => {
     if (currentUser?.role === 'RESTAURANT') {
       setPage('products')
@@ -156,12 +162,13 @@ function App() {
 
       {(page === 'auth' || page === 'dashboard') && (
         <Auth
-          currentUser={currentUser}
-          onLogin={setCurrentUser}
-          onManageProducts={handleManageProducts}
-          onBrowseProducts={handleBrowseProducts}
-          onViewAllRequests={() => setPage('my-orders')}
-        />
+  currentUser={currentUser}
+  onLogin={setCurrentUser}
+  onManageProducts={handleManageProducts}
+  onBrowseProducts={handleBrowseProducts}
+  onViewAllRequests={() => setPage('my-orders')}
+  onViewIncomingOrders={handleViewIncomingOrders}
+/>
       )}
       {page === 'my-products' &&
         currentUser?.role === 'PRODUCER' && (
@@ -174,8 +181,42 @@ function App() {
       onBrowseProducts={handleBrowseProducts}
     />
   )}
+
+      {page === 'my-products' &&
+        currentUser?.role === 'PRODUCER' && (
+          <MyProducts onBack={() => setPage('dashboard')} />
+        )}
+
+      {page === 'my-orders' &&
+        currentUser?.role === 'RESTAURANT' && (
+          <MyOrders
+            onBack={() => setPage('dashboard')}
+            onBrowseProducts={handleBrowseProducts}
+          />
+        )}
+
+      {/* PRODUCER: Incoming Orders */}
+      {page === 'incoming-orders' &&
+        currentUser?.role === 'PRODUCER' && (
+          <main className="auth-page">
+            <section className="auth-card">
+              <h1>Incoming Orders</h1>
+              <p>Restaurant purchase requests will appear here.</p>
+
+              <button
+                type="button"
+                onClick={() => setPage('dashboard')}
+              >
+                ← Back to Dashboard
+              </button>
+            </section>
+          </main>
+        )}
     </>
   )
 }
 
 export default App
+
+    
+

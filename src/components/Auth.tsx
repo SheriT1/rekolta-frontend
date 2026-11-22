@@ -15,13 +15,17 @@ type AuthUser = {
 
 const API_URL = `http://${window.location.hostname}:3000`;
 
+
 type AuthProps = {
   currentUser: AuthUser | null
   onLogin: (user: AuthUser) => void
   onManageProducts: () => void
   onBrowseProducts: () => void
   onViewAllRequests: () => void
+  onViewIncomingOrders: () => void
 }
+
+
 
 export default function Auth({
   currentUser,
@@ -29,6 +33,7 @@ export default function Auth({
   onManageProducts,
   onBrowseProducts,
   onViewAllRequests,
+  onViewIncomingOrders,
 }: AuthProps) {
   const [mode, setMode] = useState<AuthMode>('login')
   const [role, setRole] = useState<UserRole>('PRODUCER')
@@ -194,10 +199,12 @@ export default function Auth({
         {currentUser ? (
           <div className="auth-account">
          {currentUser.role === 'PRODUCER' ? (
-          <ProducerDashboard
-                fullName={currentUser.fullName}
-                onManageProducts={onManageProducts}
-              />
+        <ProducerDashboard
+        fullName={currentUser.fullName}
+        onManageProducts={onManageProducts}
+        onViewOrders={onViewIncomingOrders}
+        />
+
             ) : currentUser.role === 'RESTAURANT' ? (
             <RestaurantDashboard
              fullName={currentUser.fullName}
