@@ -16,7 +16,6 @@ type RestaurantDashboardProps = {
   onBrowseProducts: () => void
   onViewAllRequests?: () => void
   onViewFavorites?: () => void
-  onCancelRequest?: (requestId: string) => void
 }
 
 function getStatusLabel(status: string) {
@@ -97,12 +96,13 @@ export default function RestaurantDashboard({
   onBrowseProducts,
   onViewAllRequests,
   onViewFavorites,
-  onCancelRequest,
 }: RestaurantDashboardProps) {
   const firstName = fullName.trim().split(/\s+/)[0] || 'Restaurant Owner'
   const [purchaseRequests, setPurchaseRequests] = useState<RestaurantRequest[]>([])
   const [requestsLoading, setRequestsLoading] = useState(true)
   const [requestsError, setRequestsError] = useState('')
+  const [cancelError, setCancelError] = useState('')
+  const [cancellingId, setCancellingId] = useState<string | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -157,15 +157,54 @@ export default function RestaurantDashboard({
 
   const recentRequests = purchaseRequests.slice(0, 3)
 
-  function handleCancel(id: string) {
-    if (!onCancelRequest) return
+ 
+async function handleCancel(id: string) {
+  if (cancellingId !== null) return
 
-    const confirmed = window.confirm(
-      'Are you sure you want to cancel this purchase request?'
+  const confirmed = window.confirm(
+    'Are you sure you want to cancel this purchase request?'
+  )
+
+  if (!confirmed) return
+
+  setCancellingId(id)
+  setCancelError('')
+
+  try {
+    const response = await fetch(
+      `${API_URL}/purchase-requests/${encodeURIComponent(id)}/cancel`,
+      {
+        method: 'PATCH',
+        credentials: 'include',
+      }
     )
 
-    if (confirmed) onCancelRequest(id)
+    if (!response.ok) {
+      throw new Error(
+        response.status === 401 || response.status === 403
+          ? 'Your session has expired or you are not allowed to cancel this request.'
+          : `Could not cancel purchase request (HTTP ${response.status}).`
+      )
+    }
+
+    setPurchaseRequests((previousRequests) =>
+      previousRequests.map((request) =>
+        request.id === id
+          ? { ...request, status: 'CANCELLED' }
+          : request
+      )
+    )
+  } catch (error) {
+    setCancelError(
+      error instanceof Error
+        ? error.message
+        : 'Unable to cancel the request.'
+    )
+  } finally {
+    setCancellingId(null)
   }
+}
+
 
   return (
     <section className="producer-dashboard restaurant-dashboard">
@@ -218,6 +257,11 @@ export default function RestaurantDashboard({
           </div>
 
           <div className="restaurant-requests-body">
+            {cancelError && (
+            <div className="restaurant-requests-empty" role="alert">
+             <p>{cancelError}</p>
+            </div>
+            )}
            {requestsLoading ? (
             <div className="restaurant-requests-empty">
             <p>Loading purchase requests...</p>
@@ -285,15 +329,17 @@ export default function RestaurantDashboard({
                         Request status: {getStatusLabel(request.status)}
                       </span>
 
-                      {request.status === 'SUBMITTED' &&
-                        onCancelRequest && (
-                          <button
-                            type="button"
-                            className="restaurant-cancel-button"
-                            onClick={() => handleCancel(request.id)}
-                          >
-                            Cancel Request
-                          </button>
+                     {request.status === 'SUBMITTED' && (
+                        <button
+                        type="button"
+                        className="restaurant-cancel-button"
+                        disabled={cancellingId !== null}
+                        onClick={() => void handleCancel(request.id)}
+                        >
+                      {cancellingId === request.id
+                       ? 'Cancelling...'
+                      : 'Cancel Request'}
+                        </button>
                         )}
                     </div>
                   )}

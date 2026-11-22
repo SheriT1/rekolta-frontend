@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react'
 import './MyOrders.css'
 
@@ -92,6 +93,8 @@ export default function MyOrders({ onBack, onBrowseProducts }: MyOrdersProps) {
   const [requests, setRequests] = useState<RestaurantRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [cancelError, setCancelError] = useState('')
+  const [cancellingId, setCancellingId] = useState<string | null>(null)
   const [expandedId, setExpandedId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -103,19 +106,23 @@ export default function MyOrders({ onBack, onBrowseProducts }: MyOrdersProps) {
           credentials: 'include',
           signal: controller.signal,
         })
+
         if (!response.ok) {
           throw new Error(response.status === 401 || response.status === 403
             ? 'Your session has expired. Please log in again.'
             : `Could not load purchase requests (HTTP ${response.status}).`)
         }
+
         const payload: unknown = await response.json()
         const envelope = asRecord(payload)
         const list = Array.isArray(payload)
           ? payload
           : pick(envelope, 'requests', 'purchaseRequests', 'data', 'items')
+
         if (!Array.isArray(list)) {
           throw new Error('The server returned an unexpected purchase requests format.')
         }
+
         if (!controller.signal.aborted) {
           setRequests(list.map(mapPurchaseRequest))
           setError('')
@@ -133,6 +140,49 @@ export default function MyOrders({ onBack, onBrowseProducts }: MyOrdersProps) {
     return () => controller.abort()
   }, [])
 
+  async function handleCancelRequest(requestId: string) {
+    const confirmed = window.confirm(
+      'Are you sure you want to cancel this purchase request?'
+    )
+
+    if (!confirmed) return
+
+    setCancellingId(requestId)
+    setCancelError('')
+
+    try {
+      const response = await fetch(
+        `${API_URL}/purchase-requests/${encodeURIComponent(requestId)}/cancel`,
+        {
+          method: 'PATCH',
+          credentials: 'include',
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error(
+          response.status === 401 || response.status === 403
+            ? 'Your session has expired or you are not allowed to cancel this request.'
+            : `Could not cancel purchase request (HTTP ${response.status}).`
+        )
+      }
+
+      setRequests((previousRequests) =>
+        previousRequests.map((request) =>
+          request.id === requestId
+            ? { ...request, status: 'CANCELLED' }
+            : request
+        )
+      )
+    } catch (err) {
+      setCancelError(
+        err instanceof Error ? err.message : 'Unable to cancel the request.'
+      )
+    } finally {
+      setCancellingId(null)
+    }
+  }
+
   return (
     <main className="my-orders-page">
       <div className="my-orders-heading">
@@ -141,6 +191,7 @@ export default function MyOrders({ onBack, onBrowseProducts }: MyOrdersProps) {
           <h1>My Orders</h1>
           <p>Follow your purchase requests from local producers.</p>
         </div>
+
         <button type="button" className="my-orders-back" onClick={onBack}>
           ← Back to Dashboard
         </button>
@@ -151,15 +202,28 @@ export default function MyOrders({ onBack, onBrowseProducts }: MyOrdersProps) {
           <h2>All Purchase Requests</h2>
           {!loading && !error && <span>{requests.length} total</span>}
         </div>
+
         <div className="restaurant-requests-body">
+          {cancelError && (
+            <div className="restaurant-requests-empty" role="alert">
+              <p>{cancelError}</p>
+            </div>
+          )}
+
           {loading ? (
-            <div className="restaurant-requests-empty"><p>Loading purchase requests...</p></div>
+            <div className="restaurant-requests-empty">
+              <p>Loading purchase requests...</p>
+            </div>
           ) : error ? (
-            <div className="restaurant-requests-empty" role="alert"><p>{error}</p></div>
+            <div className="restaurant-requests-empty" role="alert">
+              <p>{error}</p>
+            </div>
           ) : requests.length === 0 ? (
             <div className="restaurant-requests-empty">
               <p>You haven't submitted any purchase requests yet.</p>
-              <button type="button" onClick={onBrowseProducts}>Browse Products →</button>
+              <button type="button" onClick={onBrowseProducts}>
+                Browse Products →
+              </button>
             </div>
           ) : requests.map((request) => (
             <div className="restaurant-request" key={request.id}>
@@ -167,27 +231,50 @@ export default function MyOrders({ onBack, onBrowseProducts }: MyOrdersProps) {
                 type="button"
                 className="restaurant-request-main"
                 aria-expanded={expandedId === request.id}
-                onClick={() => setExpandedId(expandedId === request.id ? null : request.id)}
+                onClick={() =>
+                  setExpandedId(expandedId === request.id ? null : request.id)
+                }
               >
                 <div className="restaurant-request-product">
-                  {request.image && <img src={request.image} alt={request.productName} />}
+                  {request.image && (
+                    <img src={request.image} alt={request.productName} />
+                  )}
                   <div>
                     <strong>{request.productName}</strong>
                     <span>{request.producerName}</span>
                   </div>
                 </div>
+
                 <span>{request.quantity}</span>
                 <span>€{request.totalPrice.toFixed(2)}</span>
-                <span className={`restaurant-status restaurant-status-${request.status.toLowerCase()}`}>
+
+                <span
+                  className={`restaurant-status restaurant-status-${request.status.toLowerCase()}`}
+                >
                   {statusLabel(request.status)}
                 </span>
+
                 <span className="restaurant-request-chevron" aria-hidden="true">
                   {expandedId === request.id ? '⌃' : '⌄'}
                 </span>
               </button>
+
               {expandedId === request.id && (
                 <div className="restaurant-request-details">
                   <span>Request status: {statusLabel(request.status)}</span>
+
+                  {request.status === 'SUBMITTED' && (
+                    <button
+                      type="button"
+                      className="my-orders-cancel-button"
+                      disabled={cancellingId !== null}
+                      onClick={() => void handleCancelRequest(request.id)}
+                    >
+                      {cancellingId === request.id
+                        ? 'Cancelling...'
+                        : 'Cancel Request'}
+                    </button>
+                  )}
                 </div>
               )}
             </div>

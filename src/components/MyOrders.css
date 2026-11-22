@@ -44,3 +44,24 @@
   .my-orders-page { width: calc(100% - 24px); margin-top: 24px; }
   .my-orders-heading { align-items: flex-start; flex-direction: column; }
 }
+.my-orders-cancel-button {
+  padding: 9px 16px;
+  border: 1px solid #dc3545;
+  border-radius: 8px;
+  background: transparent;
+  color: #dc3545;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.my-orders-cancel-button:hover:not(:disabled) {
+  background: #dc3545;
+  color: #fff;
+}
+
+.my-orders-cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
