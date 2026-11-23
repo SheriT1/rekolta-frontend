@@ -7,6 +7,7 @@ import ProductDetails from './components/ProductDetails'
 import Auth from './components/Auth'
 import MyProducts from './components/MyProducts'
 import MyOrders from './components/MyOrders'
+import IncomingOrders from './components/IncomingOrders'
 import './App.css'
 
 type Page =
@@ -197,21 +198,9 @@ function App() {
 
       {/* PRODUCER: Incoming Orders */}
       {page === 'incoming-orders' &&
-        currentUser?.role === 'PRODUCER' && (
-          <main className="auth-page">
-            <section className="auth-card">
-              <h1>Incoming Orders</h1>
-              <p>Restaurant purchase requests will appear here.</p>
-
-              <button
-                type="button"
-                onClick={() => setPage('dashboard')}
-              >
-                ← Back to Dashboard
-              </button>
-            </section>
-          </main>
-        )}
+  currentUser?.role === 'PRODUCER' && (
+    <IncomingOrders onBack={() => setPage('dashboard')} />
+  )}
     </>
   )
 }
