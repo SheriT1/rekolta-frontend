@@ -390,11 +390,11 @@ export default function IncomingOrders({
                       </td>
 
                       <td>
-                        {Number(order.unit_price).toFixed(2)} BGN
+                        €{Number(order.unit_price).toFixed(2)}
                       </td>
 
                       <td className="incoming-total">
-                        {total.toFixed(2)} BGN
+                        €{total.toFixed(2)} 
                       </td>
 
                       <td>
