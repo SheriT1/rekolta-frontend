@@ -672,7 +672,10 @@ export default function MyOrders({
                       </div>
                     </div>
 
-                    {request.status === 'SUBMITTED' && (
+                   
+                    {(request.status === 'SUBMITTED' ||
+                    request.status === 'ACCEPTED') && (
+
                       <button
                         type="button"
                         className="my-orders-cancel-button"
