@@ -1,4 +1,5 @@
 
+
 import { useEffect, useState } from 'react'
 import Home from './components/Home'
 import Navbar from './components/Navbar'
@@ -108,11 +109,13 @@ function App() {
       setPage('my-products')
     }
   }
+
   const handleViewIncomingOrders = () => {
-  if (currentUser?.role === 'PRODUCER') {
-    setPage('incoming-orders')
+    if (currentUser?.role === 'PRODUCER') {
+      setPage('incoming-orders')
+    }
   }
-}
+
   const handleBrowseProducts = () => {
     if (currentUser?.role === 'RESTAURANT') {
       setPage('products')
@@ -144,50 +147,50 @@ function App() {
         </p>
       )}
 
+      {/* Home */}
       {page === 'home' && (
         <Home onExploreProducts={() => setPage('products')} />
       )}
 
-       {page === 'products' && (
+      {/* Products */}
+      {page === 'products' && (
         <Products onViewDetails={handleViewProductDetails} />
       )}
 
-      
-    {page === 'product-details' && selectedProductId && (
-    <ProductDetails
-    productId={selectedProductId}
-    onBack={handleBackToProducts}
-    isRestaurant={currentUser?.role === 'RESTAURANT'}
-    />
-    )}
+      {/* Product Details */}
+      {page === 'product-details' && selectedProductId && (
+        <ProductDetails
+          productId={selectedProductId}
+          onBack={handleBackToProducts}
+          isRestaurant={currentUser?.role === 'RESTAURANT'}
+        />
+      )}
 
+      {/* Authentication and Dashboard */}
       {(page === 'auth' || page === 'dashboard') && (
         <Auth
-  currentUser={currentUser}
-  onLogin={setCurrentUser}
-  onManageProducts={handleManageProducts}
-  onBrowseProducts={handleBrowseProducts}
-  onViewAllRequests={() => setPage('my-orders')}
-  onViewIncomingOrders={handleViewIncomingOrders}
-/>
+          currentUser={currentUser}
+          onLogin={setCurrentUser}
+          onManageProducts={handleManageProducts}
+          onBrowseProducts={handleBrowseProducts}
+          onViewAllRequests={() => {
+            if (currentUser?.role === 'RESTAURANT') {
+              setPage('my-orders')
+            }
+          }}
+          onViewIncomingOrders={handleViewIncomingOrders}
+        />
       )}
+
+      {/* Producer: My Products */}
       {page === 'my-products' &&
         currentUser?.role === 'PRODUCER' && (
-          <MyProducts onBack={() => setPage('dashboard')} />
-        )}
-        {page === 'my-orders' &&
-  currentUser?.role === 'RESTAURANT' && (
-    <MyOrders
-      onBack={() => setPage('dashboard')}
-      onBrowseProducts={handleBrowseProducts}
-    />
-  )}
-
-      {page === 'my-products' &&
-        currentUser?.role === 'PRODUCER' && (
-          <MyProducts onBack={() => setPage('dashboard')} />
+          <MyProducts
+            onBack={() => setPage('dashboard')}
+          />
         )}
 
+      {/* Restaurant: My Orders */}
       {page === 'my-orders' &&
         currentUser?.role === 'RESTAURANT' && (
           <MyOrders
@@ -196,16 +199,17 @@ function App() {
           />
         )}
 
-      {/* PRODUCER: Incoming Orders */}
+      {/* Producer: Incoming Orders */}
       {page === 'incoming-orders' &&
-  currentUser?.role === 'PRODUCER' && (
-    <IncomingOrders onBack={() => setPage('dashboard')} />
-  )}
+        currentUser?.role === 'PRODUCER' && (
+          <IncomingOrders
+            onBack={() => setPage('dashboard')}
+          />
+        )}
     </>
   )
 }
 
 export default App
 
-    
 
