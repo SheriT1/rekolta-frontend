@@ -391,3 +391,122 @@
     padding: 18px;
   }
 }
+
+/* Pickup & Delivery button */
+
+.my-orders-arrange-button {
+  margin-top: 12px;
+  padding: 10px 18px;
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.my-orders-arrange-button:hover {
+  background-color: #1b5e20;
+}
+
+.my-orders-arrange-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Pickup & Delivery form */
+
+.my-orders-arrangement-form {
+  margin-top: 16px;
+  padding: 20px;
+  background-color: #f8faf8;
+  border: 1px solid #dce8dc;
+  border-radius: 12px;
+}
+
+.my-orders-arrangement-form h3 {
+  margin: 0 0 16px;
+  color: #245c2a;
+  font-size: 18px;
+}
+
+.my-orders-arrangement-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.my-orders-arrangement-form label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.my-orders-arrangement-form input,
+.my-orders-arrangement-form select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.my-orders-arrangement-form input:focus,
+.my-orders-arrangement-form select:focus {
+  outline: none;
+  border-color: #2e7d32;
+}
+
+.my-orders-arrangement-form button[type="submit"] {
+  margin-top: 8px;
+  padding: 12px 16px;
+  background-color: #2e7d32;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.my-orders-arrangement-form button[type="submit"]:hover {
+  background-color: #1b5e20;
+}
+
+/* Existing arrangement details */
+
+.my-orders-arrangement-details {
+  padding: 14px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+}
+
+.my-orders-arrangement-details p {
+  margin: 8px 0;
+  font-size: 14px;
+}
+
+/* Error messages */
+
+.my-orders-arrangement-error {
+  margin-top: 12px;
+  color: #b91c1c;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Mobile responsiveness */
+
+@media (max-width: 600px) {
+  .my-orders-arrangement-form {
+    padding: 14px;
+  }
+
+  .my-orders-arrange-button {
+    width: 100%;
+  }
+}
+

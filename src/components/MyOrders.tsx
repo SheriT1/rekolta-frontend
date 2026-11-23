@@ -8,6 +8,25 @@ type OrderStatus =
   | 'REJECTED'
   | 'CANCELLED'
 
+
+type FulfilmentMethod = 'PICKUP' | 'DELIVERY'
+
+type FulfilmentStatus =
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'CANCELLED'
+
+type FulfilmentArrangement = {
+  id: string
+  purchase_request_id: string
+  method: FulfilmentMethod
+  delivery_address: string | null
+  pickup_point: string | null
+  preferred_date: string
+  preferred_time: string | null
+  status: FulfilmentStatus
+}
+
 type OrderFilter = 'ALL' | OrderStatus
 
 type RestaurantRequest = {
@@ -257,6 +276,28 @@ export default function MyOrders({
     string | null
   >(null)
 
+  // Pickup & Delivery arrangement state
+  const [arrangementOrderId, setArrangementOrderId] =
+    useState<string | null>(null)
+
+  const [fulfilmentMethod, setFulfilmentMethod] =
+    useState<FulfilmentMethod>('PICKUP')
+
+  const [preferredDate, setPreferredDate] = useState('')
+  const [preferredTime, setPreferredTime] = useState('')
+  const [fulfilmentLocation, setFulfilmentLocation] =
+    useState('')
+
+  const [arrangements, setArrangements] = useState<
+    Record<string, FulfilmentArrangement | null>
+  >({})
+
+  const [arrangementLoading, setArrangementLoading] =
+    useState(false)
+
+  const [arrangementError, setArrangementError] =
+    useState('')
+
   const [filter, setFilter] = useState<OrderFilter>('ALL')
   const [search, setSearch] = useState('')
 
@@ -326,6 +367,201 @@ export default function MyOrders({
 
     return () => controller.abort()
   }, [])
+
+  // RESTAURANT: Load pickup/delivery arrangement for an order
+  async function loadArrangement(requestId: string) {
+    setArrangementLoading(true)
+    setArrangementError('')
+
+    try {
+      const response = await fetch(
+        `${API_URL}/fulfilment-arrangements/request/${encodeURIComponent(
+          requestId
+        )}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      )
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            'Your session has expired. Please log in again.'
+          )
+        }
+
+        if (response.status === 403) {
+          throw new Error(
+            'You are not allowed to view this arrangement.'
+          )
+        }
+
+        if (response.status === 404) {
+          throw new Error('Purchase request not found.')
+        }
+
+        throw new Error(
+          `Could not load arrangement (HTTP ${response.status}).`
+        )
+      }
+
+      const arrangement: FulfilmentArrangement | null =
+        await response.json()
+
+      setArrangements(previous => ({
+        ...previous,
+        [requestId]: arrangement,
+      }))
+
+      return arrangement
+    } catch (err) {
+      setArrangementError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to load pickup/delivery arrangement.'
+      )
+
+      return null
+    } finally {
+      setArrangementLoading(false)
+    }
+  }
+
+
+  // RESTAURANT: Submit pickup/delivery arrangement
+  async function handleCreateArrangement() {
+    if (!arrangementOrderId || arrangementLoading) return
+
+    setArrangementError('')
+
+    if (!preferredDate) {
+      setArrangementError('Please select a preferred date.')
+      return
+    }
+
+    if (!fulfilmentLocation.trim()) {
+      setArrangementError(
+        fulfilmentMethod === 'PICKUP'
+          ? 'Please enter a pickup point.'
+          : 'Please enter a delivery address.'
+      )
+      return
+    }
+
+    setArrangementLoading(true)
+
+    try {
+      const requestBody = {
+        purchaseRequestId: arrangementOrderId,
+        method: fulfilmentMethod,
+        preferredDate,
+        ...(preferredTime.trim()
+          ? { preferredTime: preferredTime.trim() }
+          : {}),
+        ...(fulfilmentMethod === 'PICKUP'
+          ? { pickupPoint: fulfilmentLocation.trim() }
+          : { deliveryAddress: fulfilmentLocation.trim() }),
+      }
+
+      const response = await fetch(
+        `${API_URL}/fulfilment-arrangements`,
+        {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        }
+      )
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            'Your session has expired. Please log in again.'
+          )
+        }
+
+        if (response.status === 403) {
+          throw new Error(
+            'Only restaurant accounts can create arrangements.'
+          )
+        }
+
+        if (response.status === 404) {
+          throw new Error('Purchase request not found.')
+        }
+
+        if (response.status === 409) {
+          throw new Error(
+            'An arrangement already exists for this order.'
+          )
+        }
+
+        if (response.status === 400) {
+          throw new Error(
+            'Invalid arrangement details. Check the date, time and location.'
+          )
+        }
+
+        throw new Error(
+          `Could not create arrangement (HTTP ${response.status}).`
+        )
+      }
+
+
+      // The backend may return an empty response body
+      // even when the arrangement was saved successfully.
+      // Reload the saved arrangement using the GET endpoint.
+      const arrangementResponse = await fetch(
+        `${API_URL}/fulfilment-arrangements/request/${encodeURIComponent(
+          arrangementOrderId
+        )}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      )
+
+      if (!arrangementResponse.ok) {
+        throw new Error(
+          'Arrangement was submitted, but could not be reloaded.'
+        )
+      }
+
+      const arrangement: FulfilmentArrangement | null =
+        await arrangementResponse.json()
+
+      if (!arrangement) {
+        throw new Error(
+          'Arrangement was submitted, but no saved arrangement was found.'
+        )
+      }
+
+      setArrangements(previous => ({
+        ...previous,
+        [arrangementOrderId]: arrangement,
+      }))
+
+
+      setArrangementOrderId(null)
+      setPreferredDate('')
+      setPreferredTime('')
+      setFulfilmentLocation('')
+      setFulfilmentMethod('PICKUP')
+      setArrangementError('')
+    } catch (err) {
+      setArrangementError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to create pickup/delivery arrangement.'
+      )
+    } finally {
+      setArrangementLoading(false)
+    }
+  }
+
 
   async function handleCancelRequest(requestId: string) {
     if (cancellingRef.current) return
@@ -690,11 +926,170 @@ export default function MyOrders({
                       </button>
                     )}
 
-                    {request.status === 'ACCEPTED' && (
-                      <p className="my-orders-status-note accepted">
-                        ✓ The producer has accepted your request.
-                      </p>
-                    )}
+                    
+        {request.status === 'ACCEPTED' && (
+        <>
+          <p className="my-orders-status-note accepted">
+          ✓ The producer has accepted your request.
+        </p>
+
+        <button
+        type="button"
+         className="my-orders-arrange-button"
+         disabled={arrangementLoading}
+        onClick={() => {
+        setArrangementOrderId(request.id)
+        setFulfilmentMethod('PICKUP')
+        setPreferredDate('')
+        setPreferredTime('')
+        setFulfilmentLocation('')
+        setArrangementError('')
+
+        void loadArrangement(request.id)
+      }}
+    >
+      Arrange Pickup / Delivery
+    </button>
+
+{arrangementOrderId === request.id && (
+  <div className="my-orders-arrangement-form">
+    <h3>Arrange Pickup / Delivery</h3>
+
+    {arrangementLoading ? (
+      <p>Loading arrangement details...</p>
+    ) : arrangements[request.id] ? (
+      <div className="my-orders-arrangement-details">
+        <p>
+          <strong>Method:</strong>{' '}
+          {arrangements[request.id]?.method}
+        </p>
+
+        <p>
+          <strong>Location:</strong>{' '}
+          {arrangements[request.id]?.method === 'PICKUP'
+            ? arrangements[request.id]?.pickup_point
+            : arrangements[request.id]?.delivery_address}
+        </p>
+
+        <p>
+          <strong>Date:</strong>{' '}
+          {arrangements[request.id]?.preferred_date
+            ? new Date(
+                arrangements[request.id]!.preferred_date
+              ).toLocaleDateString()
+            : 'Not specified'}
+        </p>
+
+        <p>
+          <strong>Status:</strong>{' '}
+          {arrangements[request.id]?.status}
+        </p>
+      </div>
+    ) : (
+      <form
+        onSubmit={event => {
+          event.preventDefault()
+          void handleCreateArrangement()
+        }}
+      >
+        <label htmlFor="fulfilment-method">
+          Arrangement method
+        </label>
+
+        <select
+          id="fulfilment-method"
+          value={fulfilmentMethod}
+          onChange={event => {
+            setFulfilmentMethod(
+              event.target.value as FulfilmentMethod
+            )
+            setFulfilmentLocation('')
+          }}
+        >
+          <option value="PICKUP">Pickup</option>
+          <option value="DELIVERY">Delivery</option>
+        </select>
+
+        <label htmlFor="fulfilment-date">
+          Preferred date
+        </label>
+
+        <input
+          id="fulfilment-date"
+          type="date"
+          required
+          value={preferredDate}
+          min={new Date().toLocaleDateString('en-CA')}
+          onChange={event =>
+            setPreferredDate(event.target.value)
+          }
+        />
+
+        <label htmlFor="fulfilment-time">
+          Preferred time (optional)
+        </label>
+
+        <input
+          id="fulfilment-time"
+          type="time"
+          value={preferredTime}
+          onChange={event =>
+            setPreferredTime(event.target.value)
+          }
+        />
+
+        <label htmlFor="fulfilment-location">
+          {fulfilmentMethod === 'PICKUP'
+            ? 'Pickup point'
+            : 'Delivery address'}
+        </label>
+
+        <input
+          id="fulfilment-location"
+          type="text"
+          required
+          maxLength={255}
+          placeholder={
+            fulfilmentMethod === 'PICKUP'
+              ? 'Enter pickup location'
+              : 'Enter delivery address'
+          }
+          value={fulfilmentLocation}
+          onChange={event =>
+            setFulfilmentLocation(event.target.value)
+          }
+        />
+
+        <button
+          type="submit"
+          disabled={arrangementLoading}
+        >
+          Submit Arrangement
+        </button>
+      </form>
+    )}
+
+    {arrangementError && (
+      <p role="alert" className="my-orders-arrangement-error">
+        {arrangementError}
+      </p>
+    )}
+
+    <button
+      type="button"
+      onClick={() => {
+        setArrangementOrderId(null)
+        setArrangementError('')
+      }}
+    >
+      Close
+    </button>
+  </div>
+)}
+
+  </>
+)}
+
 
                     {request.status === 'REJECTED' && (
                       <p className="my-orders-status-note rejected">
