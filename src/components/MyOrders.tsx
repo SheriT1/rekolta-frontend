@@ -252,7 +252,7 @@ function formatDate(value?: string): string {
 
   return date.toLocaleDateString('en-GB', {
     day: '2-digit',
-    month: 'short',
+    month: 'long',
     year: 'numeric',
   })
 }
@@ -779,8 +779,8 @@ export default function MyOrders({
 
       {/* Requests */}
 
-      <section className="restaurant-requests-card my-orders-card">
-        <div className="restaurant-requests-header">
+      <section className="my-orders-requests-card my-orders-card">
+        <div className="my-orders-requests-header">
           <h2>
             {filter === 'ALL'
               ? 'All Purchase Requests'
@@ -796,7 +796,7 @@ export default function MyOrders({
           )}
         </div>
 
-        <div className="restaurant-requests-body">
+        <div className="my-orders-requests-body">
           {cancelError && (
             <div
               className="my-orders-error"
@@ -807,18 +807,18 @@ export default function MyOrders({
           )}
 
           {loading ? (
-            <div className="restaurant-requests-empty">
+            <div className="my-orders-requests-empty">
               <p>Loading purchase requests...</p>
             </div>
           ) : error ? (
             <div
-              className="restaurant-requests-empty"
+              className="my-orders-requests-empty"
               role="alert"
             >
               <p>{error}</p>
             </div>
           ) : requests.length === 0 ? (
-            <div className="restaurant-requests-empty">
+            <div className="my-orders-requests-empty">
               <p>
                 You haven't submitted any purchase requests yet.
               </p>
@@ -831,23 +831,23 @@ export default function MyOrders({
               </button>
             </div>
           ) : filteredRequests.length === 0 ? (
-            <div className="restaurant-requests-empty">
+            <div className="my-orders-requests-empty">
               <p>No matching purchase requests found.</p>
             </div>
           ) : (
             filteredRequests.map(request => (
               <div
-                className="restaurant-request"
+                className="my-orders-request"
                 key={request.id}
               >
                 <button
                   type="button"
-                  className="restaurant-request-main"
+                  className="my-orders-request-main"
                   aria-expanded={expandedId === request.id}
                   disabled={arrangementLoading || cancellingId !== null}
                   onClick={() => handleExpandRequest(request)}
                 >
-                  <div className="restaurant-request-product">
+                  <div className="my-orders-request-product">
                     {request.image && (
                       <img
                         src={request.image}
@@ -861,20 +861,20 @@ export default function MyOrders({
                     </div>
                   </div>
 
-                  <span>{request.quantity}</span>
+                  <span className="my-orders-row-quantity">{request.quantity}</span>
 
                   <span>
                     {formatPrice(request.totalPrice)}
                   </span>
 
                   <span
-                    className={`restaurant-status restaurant-status-${request.status.toLowerCase()}`}
+                    className={`my-orders-status my-orders-status-${request.status.toLowerCase()}`}
                   >
                     {statusLabel(request.status)}
                   </span>
 
                   <span
-                    className="restaurant-request-chevron"
+                    className="my-orders-request-chevron"
                     aria-hidden="true"
                   >
                     {expandedId === request.id ? '⌃' : '⌄'}
@@ -882,7 +882,7 @@ export default function MyOrders({
                 </button>
 
                 {expandedId === request.id && (
-                  <div className="restaurant-request-details my-orders-details">
+                  <div className="my-orders-details">
                     <div className="my-orders-detail-grid">
                       <div>
                         <span>Product</span>
@@ -992,56 +992,41 @@ onClick={() =>
 {!arrangementLoading &&
   !arrangementError &&
   arrangements[request.id] && (
-    <div className="my-orders-arrangement-form">
-      <h3>Pickup & Delivery</h3>
-
+    <div className="my-orders-arrangement-card">
+      <div className="my-orders-arrangement-header">
+        <h3>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M2 4h13v13H2z M15 9h4l3 4v4h-7" />
+            <circle cx="6" cy="18" r="2" />
+            <circle cx="18" cy="18" r="2" />
+          </svg>
+          Pickup &amp; Delivery
+        </h3>
+        <span className={`my-orders-fulfilment-status fulfilment-${arrangements[request.id]?.status.toLowerCase()}`}>
+          {arrangements[request.id]?.status === 'CONFIRMED'
+            ? '✓ Confirmed by producer'
+            : arrangements[request.id]?.status === 'PENDING'
+              ? 'Awaiting producer confirmation'
+              : 'Cancelled'}
+        </span>
+      </div>
       <div className="my-orders-arrangement-details">
-        <p>
-          <strong>Method:</strong>{' '}
-          {arrangements[request.id]?.method === 'PICKUP'
-            ? 'Pickup'
-            : 'Delivery'}
-        </p>
-
-        <p>
-          <strong>Location:</strong>{' '}
-          {arrangements[request.id]?.method === 'PICKUP'
-            ? arrangements[request.id]?.pickup_point
-            : arrangements[request.id]?.delivery_address}
-        </p>
-
-        <p>
-          <strong>Date:</strong>{' '}
-          {arrangements[request.id]?.preferred_date
-            ? new Date(
-                arrangements[request.id]!.preferred_date
-              ).toLocaleDateString('en-GB', {
-                timeZone: 'UTC',
-              })
-            : 'Not specified'}
-        </p>
-
-        <p>
-          <strong>Time:</strong>{' '}
-          {arrangements[request.id]?.preferred_time
-            ? arrangements[request.id]!.preferred_time!.slice(11, 16)
-            : 'Not specified'}
-        </p>
-
-        <p>
-          <strong>Status:</strong>{' '}
-          <span
-            className={`my-orders-fulfilment-status fulfilment-${arrangements[
-              request.id
-            ]?.status.toLowerCase()}`}
-          >
-            {arrangements[request.id]?.status === 'CONFIRMED'
-              ? 'Confirmed by producer'
-              : arrangements[request.id]?.status === 'PENDING'
-                ? 'Awaiting producer confirmation'
-                : 'Cancelled'}
-          </span>
-        </p>
+        <div className="my-orders-arrangement-field">
+          <span>Method</span>
+          <strong>{arrangements[request.id]?.method === 'PICKUP' ? 'Pickup' : 'Delivery'}</strong>
+        </div>
+        <div className="my-orders-arrangement-field">
+          <span>{arrangements[request.id]?.method === 'PICKUP' ? 'Pickup point' : 'Delivery address'}</span>
+          <strong>{(arrangements[request.id]?.method === 'PICKUP' ? arrangements[request.id]?.pickup_point : arrangements[request.id]?.delivery_address) || 'Not specified'}</strong>
+        </div>
+        <div className="my-orders-arrangement-field">
+          <span>Preferred date</span>
+          <strong>{arrangements[request.id]?.preferred_date ? new Date(arrangements[request.id]!.preferred_date).toLocaleDateString('en-GB', {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC'}) : 'Not specified'}</strong>
+        </div>
+        <div className="my-orders-arrangement-field">
+          <span>Preferred time</span>
+          <strong>{arrangements[request.id]?.preferred_time ? arrangements[request.id]!.preferred_time!.slice(11, 16) : 'Not specified'}</strong>
+        </div>
       </div>
     </div>
   )}
