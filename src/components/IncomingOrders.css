@@ -470,3 +470,281 @@
     padding: 10px;
   }
 }
+
+
+/* =========================================
+   REKOLTA — Fulfilment arrangements
+   ========================================= */
+
+.incoming-arrangement {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* View arrangement button */
+
+.incoming-action-button.incoming-arrangement-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #edf1e9;
+  color: #34533a;
+  border: 1px solid #d5dfd0;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+.incoming-arrangement-button::after {
+  content: '›';
+  font-size: 19px;
+  line-height: 1;
+  transition: transform 180ms ease;
+}
+
+.incoming-action-button.incoming-arrangement-button:hover:not(:disabled) {
+  background: #e1e9db;
+  border-color: #9caf94;
+}
+
+.incoming-action-button.incoming-arrangement-button[aria-expanded="true"] {
+  background: #dce7d5;
+  border-color: #a5b69b;
+}
+
+.incoming-arrangement-button[aria-expanded="true"]::after {
+  transform: rotate(90deg);
+}
+
+/* Expandable table row */
+
+.incoming-table .incoming-arrangement-row > td {
+  height: auto;
+  padding: 0;
+  background: #f3f5ef;
+  text-align: left;
+  white-space: normal;
+}
+
+.incoming-arrangement-expanded {
+  padding: 18px 20px 22px;
+}
+
+/* Arrangement card */
+
+.incoming-arrangement-details {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 0.8fr)
+    minmax(0, 2fr)
+    minmax(0, 1fr)
+    minmax(0, 0.8fr);
+  align-items: start;
+  gap: 22px 28px;
+  width: 100%;
+  padding: 24px 28px;
+  box-sizing: border-box;
+  background: #fafbf7;
+  border: 1px solid #dce1d8;
+  border-left: 3px solid #56734b;
+  border-radius: 4px 8px 8px 4px;
+  text-align: left;
+  animation: arrangement-reveal 220ms ease-out both;
+}
+
+@keyframes arrangement-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Card heading */
+
+.incoming-arrangement-details h4 {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dce1d8;
+  color: #293e2e;
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.4px;
+}
+
+/* Arrangement information */
+
+.incoming-arrangement-details p {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 7px;
+  margin: 0;
+  color: #344437;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.incoming-arrangement-details p strong {
+  color: #747d70;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Arrangement status */
+
+.incoming-arrangement-details p:has(.incoming-fulfilment-status) {
+  grid-column: 1 / 3;
+  align-self: center;
+}
+
+.incoming-fulfilment-status {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: 0.4px;
+}
+
+.incoming-fulfilment-status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.fulfilment-pending {
+  color: #946822;
+}
+
+.fulfilment-confirmed {
+  color: #397348;
+}
+
+.fulfilment-cancelled {
+  color: #a34740;
+}
+
+/* Confirm arrangement button */
+
+.incoming-confirm-arrangement {
+  grid-column: 3 / -1;
+  justify-self: end;
+  align-self: end;
+  padding: 13px 20px;
+  background: #304e37;
+  color: #ffffff;
+  border: 1px solid #304e37;
+  border-radius: 5px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.incoming-confirm-arrangement:hover:not(:disabled) {
+  background: #213d29;
+  transform: translateY(-1px);
+}
+
+.incoming-confirm-arrangement:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Confirmed message */
+
+.incoming-arrangement-details .incoming-arrangement-confirmed {
+  grid-column: 3 / -1;
+  align-self: end;
+  display: block;
+  padding: 12px;
+  background: #e8efe3;
+  border-left: 2px solid #56734b;
+  color: #345c3b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Close details button */
+
+.incoming-arrangement-close {
+  grid-column: 1 / -1;
+  justify-self: end;
+  padding: 5px 8px;
+  background: transparent;
+  border: none;
+  color: #747d70;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-underline-offset: 4px;
+  transition: color 180ms ease;
+}
+
+.incoming-arrangement-close:hover:not(:disabled) {
+  color: #293e2e;
+  text-decoration: underline;
+}
+
+/* Loading and empty states */
+
+.incoming-arrangement-details > p:only-of-type {
+  grid-column: 1 / -1;
+}
+
+/* Error message */
+
+.incoming-arrangement-details .incoming-arrangement-error {
+  grid-column: 1 / -1;
+  display: block;
+  padding: 12px;
+  background: #f8ece8;
+  border-left: 2px solid #a34740;
+  color: #a34740;
+  font-size: 12px;
+}
+
+/* Disabled and keyboard focus states */
+
+.incoming-arrangement-details button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.incoming-arrangement-details button:focus-visible {
+  outline: 2px solid #56734b;
+  outline-offset: 3px;
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .incoming-arrangement-details {
+    animation: none;
+  }
+
+  .incoming-arrangement-button,
+  .incoming-arrangement-button::after,
+  .incoming-arrangement-details button {
+    transition: none;
+  }
+}

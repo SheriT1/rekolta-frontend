@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import './IncomingOrders.css'
 
 type OrderStatus =
@@ -7,6 +7,25 @@ type OrderStatus =
   | 'ACCEPTED'
   | 'REJECTED'
   | 'CANCELLED'
+
+
+type FulfilmentMethod = 'PICKUP' | 'DELIVERY'
+
+type FulfilmentStatus =
+  | 'PENDING'
+  | 'CONFIRMED'
+  | 'CANCELLED'
+
+type FulfilmentArrangement = {
+  id: string
+  purchase_request_id: string
+  method: FulfilmentMethod
+  delivery_address: string | null
+  pickup_point: string | null
+  preferred_date: string
+  preferred_time: string | null
+  status: FulfilmentStatus
+}
 
 type IncomingOrder = {
   id: string
@@ -52,6 +71,25 @@ export default function IncomingOrders({
   const [processingId, setProcessingId] = useState<string | null>(null)
   const [filter, setFilter] = useState<OrderFilter>('ALL')
   const [search, setSearch] = useState('')
+
+
+  // Pickup & Delivery arrangement state
+  const [selectedArrangementOrderId, setSelectedArrangementOrderId] =
+    useState<string | null>(null)
+
+  const [arrangements, setArrangements] = useState<
+    Record<string, FulfilmentArrangement | null>
+  >({})
+
+  const [arrangementLoading, setArrangementLoading] =
+    useState(false)
+
+  const [arrangementError, setArrangementError] =
+    useState('')
+
+  const [confirmingArrangementId, setConfirmingArrangementId] =
+    useState<string | null>(null)
+
 
   const processingRef = useRef(false)
 
@@ -101,6 +139,151 @@ export default function IncomingOrders({
 
     return () => controller.abort()
   }, [])
+
+
+  // PRODUCER: Load pickup/delivery arrangement
+  async function loadArrangement(orderId: string) {
+    setArrangementLoading(true)
+    setArrangementError('')
+
+    try {
+      const response = await fetch(
+        `${API_URL}/fulfilment-arrangements/request/${encodeURIComponent(
+          orderId
+        )}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      )
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            'Your session has expired. Please log in again.'
+          )
+        }
+
+        if (response.status === 403) {
+          throw new Error(
+            'You are not allowed to view this arrangement.'
+          )
+        }
+
+        if (response.status === 404) {
+          throw new Error('Purchase request not found.')
+        }
+
+        throw new Error(
+          `Could not load arrangement (HTTP ${response.status}).`
+        )
+      }
+
+      // Handle empty responses when no arrangement exists
+      const body = await response.text()
+
+      const arrangement: FulfilmentArrangement | null =
+        body.trim() ? JSON.parse(body) : null
+
+      setArrangements(previous => ({
+        ...previous,
+        [orderId]: arrangement,
+      }))
+
+      return arrangement
+    } catch (err) {
+      setArrangementError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to load pickup/delivery arrangement.'
+      )
+
+      return undefined
+    } finally {
+      setArrangementLoading(false)
+    }
+  }
+
+
+  // PRODUCER: Confirm pickup/delivery arrangement
+  async function handleConfirmArrangement(
+    arrangementId: string,
+    orderId: string
+  ) {
+    if (confirmingArrangementId || arrangementLoading) return
+
+    const confirmed = window.confirm(
+      'Are you sure you want to confirm this pickup/delivery arrangement?'
+    )
+
+    if (!confirmed) return
+
+    setConfirmingArrangementId(arrangementId)
+    setArrangementError('')
+
+    try {
+      const response = await fetch(
+        `${API_URL}/fulfilment-arrangements/${encodeURIComponent(
+          arrangementId
+        )}/confirm`,
+        {
+          method: 'PATCH',
+          credentials: 'include',
+        }
+      )
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error(
+            'Your session has expired. Please log in again.'
+          )
+        }
+
+        if (response.status === 403) {
+          throw new Error(
+            'You are not allowed to confirm this arrangement.'
+          )
+        }
+
+        if (response.status === 404) {
+          throw new Error('Arrangement not found.')
+        }
+
+        if (
+          response.status === 400 ||
+          response.status === 409
+        ) {
+          throw new Error(
+            'This arrangement can no longer be confirmed. Please refresh the details.'
+          )
+        }
+
+        throw new Error(
+          `Could not confirm arrangement (HTTP ${response.status}).`
+        )
+      }
+
+      // Reload the arrangement instead of assuming
+      // the PATCH response contains JSON.
+      const updatedArrangement =
+        await loadArrangement(orderId)
+
+      if (updatedArrangement?.status !== 'CONFIRMED') {
+        throw new Error(
+          'Confirmation was submitted, but the confirmed status could not be verified. Please reload the arrangement.'
+        )
+      }
+    } catch (err) {
+      setArrangementError(
+        err instanceof Error
+          ? err.message
+          : 'Unable to confirm the arrangement.'
+      )
+    } finally {
+      setConfirmingArrangementId(null)
+    }
+  }
+
 
   async function handleOrderAction(
     id: string,
@@ -360,8 +543,9 @@ export default function IncomingOrders({
                     Number(order.requested_quantity) *
                     Number(order.unit_price)
 
-                  return (
-                    <tr key={order.id}>
+                   return (
+                <Fragment key={order.id}>
+                 <tr>
                       <td>
                         <div className="incoming-product">
                           <strong>
@@ -442,13 +626,165 @@ export default function IncomingOrders({
                               ✕ Decline
                             </button>
                           </div>
-                        ) : (
-                          <span className="incoming-no-actions">
-                            —
-                          </span>
-                        )}
+                
+) : order.status === 'ACCEPTED' ? (
+  <div className="incoming-arrangement">
+    <button
+      type="button"
+      className="incoming-action-button incoming-arrangement-button"
+      aria-expanded={selectedArrangementOrderId === order.id}
+      disabled={
+        arrangementLoading ||
+        confirmingArrangementId !== null
+      }
+     
+onClick={() => {
+  if (selectedArrangementOrderId === order.id) {
+    setSelectedArrangementOrderId(null)
+    setArrangementError('')
+    return
+  }
+
+  setSelectedArrangementOrderId(order.id)
+  setArrangementError('')
+  void loadArrangement(order.id)
+}}
+
+    >
+     {selectedArrangementOrderId === order.id
+  ? 'Hide Arrangement'
+  : 'View Arrangement'}
+    </button>
+  </div>
+
+) : (
+  <span className="incoming-no-actions">
+    —
+  </span>
+)}
+
                       </td>
                     </tr>
+
+        {order.status === 'ACCEPTED' &&
+        selectedArrangementOrderId === order.id && (
+             <tr className="incoming-arrangement-row">
+             <td colSpan={7}>
+              <div className="incoming-arrangement-expanded">
+                 {selectedArrangementOrderId === order.id && (
+      <div className="incoming-arrangement-details">
+        <h4>Pickup & Delivery</h4>
+
+        {arrangementLoading ? (
+          <p>Loading arrangement...</p>
+        ) : arrangementError ? (
+          <p
+            className="incoming-arrangement-error"
+            role="alert"
+          >
+            {arrangementError}
+          </p>
+        ) : arrangements[order.id] ? (
+          <>
+            <p>
+              <strong>Method:</strong>{' '}
+              {arrangements[order.id]?.method === 'PICKUP'
+                ? 'Pickup'
+                : 'Delivery'}
+            </p>
+
+            <p>
+              <strong>Location:</strong>{' '}
+              {arrangements[order.id]?.method === 'PICKUP'
+                ? arrangements[order.id]?.pickup_point
+                : arrangements[order.id]?.delivery_address}
+            </p>
+
+            <p>
+              <strong>Date:</strong>{' '}
+              {new Date(
+                arrangements[order.id]!.preferred_date
+              ).toLocaleDateString('en-GB', {
+                timeZone: 'UTC',
+              })}
+            </p>
+
+            <p>
+              <strong>Time:</strong>{' '}
+              {arrangements[order.id]?.preferred_time
+                ? arrangements[order.id]!.preferred_time!.slice(11, 16)
+                : 'Not specified'}
+            </p>
+
+            <p>
+              <strong>Status:</strong>{' '}
+              <span
+                className={`incoming-fulfilment-status fulfilment-${arrangements[
+                  order.id
+                ]?.status.toLowerCase()}`}
+              >
+                {arrangements[order.id]?.status}
+              </span>
+            </p>
+
+            {arrangements[order.id]?.status === 'PENDING' && (
+              <button
+                type="button"
+                className="incoming-confirm-arrangement"
+                disabled={
+                  confirmingArrangementId !== null ||
+                  arrangementLoading
+                }
+                onClick={() =>
+                  void handleConfirmArrangement(
+                    arrangements[order.id]!.id,
+                    order.id
+                  )
+                }
+              >
+                {confirmingArrangementId ===
+                arrangements[order.id]?.id
+                  ? 'Confirming...'
+                  : '✓ Confirm Arrangement'}
+              </button>
+            )}
+
+            {arrangements[order.id]?.status === 'CONFIRMED' && (
+              <p className="incoming-arrangement-confirmed">
+                ✓ Arrangement confirmed
+              </p>
+            )}
+          </>
+        ) : (
+          <p>
+            The restaurant has not submitted a pickup
+            or delivery arrangement yet.
+          </p>
+        )}
+
+        <button
+          type="button"
+          className="incoming-arrangement-close"
+          disabled={
+            arrangementLoading ||
+            confirmingArrangementId !== null
+          }
+          onClick={() => {
+            setSelectedArrangementOrderId(null)
+            setArrangementError('')
+          }}
+        >
+          Close
+        </button>
+      </div>
+    )}
+
+        </div>
+      </td>
+    </tr>
+  )}
+
+                    </Fragment>
                   )
                 })}
               </tbody>
