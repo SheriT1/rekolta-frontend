@@ -406,8 +406,10 @@ export default function MyOrders({
         )
       }
 
-      const arrangement: FulfilmentArrangement | null =
-        await response.json()
+      const body = await response.text()
+
+    const arrangement: FulfilmentArrangement | null =
+    body.trim() ? JSON.parse(body) : null
 
       setArrangements(previous => ({
         ...previous,
@@ -422,12 +424,28 @@ export default function MyOrders({
           : 'Unable to load pickup/delivery arrangement.'
       )
 
-      return null
+      return undefined
     } finally {
       setArrangementLoading(false)
     }
   }
+    function handleExpandRequest(request: RestaurantRequest) {
+    if (arrangementLoading || cancellingId !== null) return
 
+        setArrangementOrderId(null)
+        setArrangementError('')
+
+    if (expandedId === request.id) {
+    setExpandedId(null)
+    return
+  }
+
+    setExpandedId(request.id)
+
+    if (request.status === 'ACCEPTED') {
+    void loadArrangement(request.id)
+  }
+}
 
   // RESTAURANT: Submit pickup/delivery arrangement
   async function handleCreateArrangement() {
@@ -826,13 +844,8 @@ export default function MyOrders({
                   type="button"
                   className="restaurant-request-main"
                   aria-expanded={expandedId === request.id}
-                  onClick={() =>
-                    setExpandedId(
-                      expandedId === request.id
-                        ? null
-                        : request.id
-                    )
-                  }
+                  disabled={arrangementLoading || cancellingId !== null}
+                  onClick={() => handleExpandRequest(request)}
                 >
                   <div className="restaurant-request-product">
                     {request.image && (
@@ -914,54 +927,80 @@ export default function MyOrders({
 
                       <button
                         type="button"
-                        className="my-orders-cancel-button"
-                        disabled={cancellingId !== null}
-                        onClick={() =>
-                          void handleCancelRequest(request.id)
-                        }
-                      >
-                        {cancellingId === request.id
-                          ? 'Cancelling...'
-                          : 'Cancel Request'}
-                      </button>
-                    )}
+           className="my-orders-cancel-button"
+disabled={cancellingId !== null || arrangementLoading}
+onClick={() =>
+  void handleCancelRequest(request.id)
+}
+>
+  {cancellingId === request.id
+    ? 'Cancelling...'
+    : 'Cancel Request'}
+</button>
+)}
 
-                    
-        {request.status === 'ACCEPTED' && (
-        <>
-          <p className="my-orders-status-note accepted">
-          ✓ The producer has accepted your request.
-        </p>
+{request.status === 'ACCEPTED' && (
+  <>
+    <p className="my-orders-status-note accepted">
+      ✓ The producer has accepted your request.
+    </p>
 
-        <button
-        type="button"
-         className="my-orders-arrange-button"
-         disabled={arrangementLoading}
-        onClick={() => {
+    {arrangementLoading && arrangementOrderId !== request.id && (
+      <p>Loading arrangement details...</p>
+    )}
+
+{arrangementError && arrangementOrderId !== request.id && (
+  <div>
+    <p
+      role="alert"
+      className="my-orders-arrangement-error"
+    >
+      {arrangementError}
+    </p>
+
+    <button
+      type="button"
+      className="my-orders-arrange-button"
+      disabled={arrangementLoading || cancellingId !== null}
+      onClick={() => void loadArrangement(request.id)}
+    >
+      Retry
+    </button>
+  </div>
+)}
+{!arrangementLoading &&
+  !arrangementError &&
+  arrangements[request.id] === null &&
+  arrangementOrderId !== request.id && (
+    <button
+      type="button"
+      className="my-orders-arrange-button"
+      disabled={cancellingId !== null}
+      onClick={() => {
         setArrangementOrderId(request.id)
         setFulfilmentMethod('PICKUP')
         setPreferredDate('')
         setPreferredTime('')
         setFulfilmentLocation('')
         setArrangementError('')
-
-        void loadArrangement(request.id)
       }}
     >
       Arrange Pickup / Delivery
     </button>
+  )}
 
-{arrangementOrderId === request.id && (
-  <div className="my-orders-arrangement-form">
-    <h3>Arrange Pickup / Delivery</h3>
+{!arrangementLoading &&
+  !arrangementError &&
+  arrangements[request.id] && (
+    <div className="my-orders-arrangement-form">
+      <h3>Pickup & Delivery</h3>
 
-    {arrangementLoading ? (
-      <p>Loading arrangement details...</p>
-    ) : arrangements[request.id] ? (
       <div className="my-orders-arrangement-details">
         <p>
           <strong>Method:</strong>{' '}
-          {arrangements[request.id]?.method}
+          {arrangements[request.id]?.method === 'PICKUP'
+            ? 'Pickup'
+            : 'Delivery'}
         </p>
 
         <p>
@@ -976,16 +1015,42 @@ export default function MyOrders({
           {arrangements[request.id]?.preferred_date
             ? new Date(
                 arrangements[request.id]!.preferred_date
-              ).toLocaleDateString()
+              ).toLocaleDateString('en-GB', {
+                timeZone: 'UTC',
+              })
+            : 'Not specified'}
+        </p>
+
+        <p>
+          <strong>Time:</strong>{' '}
+          {arrangements[request.id]?.preferred_time
+            ? arrangements[request.id]!.preferred_time!.slice(11, 16)
             : 'Not specified'}
         </p>
 
         <p>
           <strong>Status:</strong>{' '}
-          {arrangements[request.id]?.status}
+          <span
+            className={`my-orders-fulfilment-status fulfilment-${arrangements[
+              request.id
+            ]?.status.toLowerCase()}`}
+          >
+            {arrangements[request.id]?.status === 'CONFIRMED'
+              ? 'Confirmed by producer'
+              : arrangements[request.id]?.status === 'PENDING'
+                ? 'Awaiting producer confirmation'
+                : 'Cancelled'}
+          </span>
         </p>
       </div>
-    ) : (
+    </div>
+  )}
+
+{arrangementOrderId === request.id &&
+  arrangements[request.id] === null && (
+    <div className="my-orders-arrangement-form">
+      <h3>Arrange Pickup / Delivery</h3>
+
       <form
         onSubmit={event => {
           event.preventDefault()
@@ -1066,30 +1131,29 @@ export default function MyOrders({
         >
           Submit Arrangement
         </button>
-      </form>
-    )}
+  </form>
 
-    {arrangementError && (
+{arrangementError && (
       <p role="alert" className="my-orders-arrangement-error">
         {arrangementError}
       </p>
     )}
 
-    <button
-      type="button"
-      onClick={() => {
-        setArrangementOrderId(null)
-        setArrangementError('')
-      }}
-    >
-      Close
-    </button>
-  </div>
+   <button
+  type="button"
+  disabled={arrangementLoading}
+  onClick={() => {
+    setArrangementOrderId(null)
+    setArrangementError('')
+  }}
+>
+  Close
+</button>
+</div>
 )}
 
-  </>
+</>
 )}
-
 
                     {request.status === 'REJECTED' && (
                       <p className="my-orders-status-note rejected">
