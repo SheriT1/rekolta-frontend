@@ -50,7 +50,7 @@
 
 .my-orders-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
   margin-bottom: 30px;
 }
@@ -103,6 +103,16 @@
 .my-orders-stat.accepted-stat .my-orders-stat-icon {
   background: #e5f4e9;
   color: #276c43;
+}
+
+.my-orders-stat.arranged-stat .my-orders-stat-icon {
+  background: #e4eef9;
+  color: #315d86;
+}
+
+.my-orders-stat.completed-stat .my-orders-stat-icon {
+  background: #dcefd5;
+  color: #175b2b;
 }
 
 .my-orders-stat.cancelled-stat .my-orders-stat-icon {
@@ -307,6 +317,16 @@
 .my-orders-card .my-orders-status-accepted {
   background: #e3f4e7;
   color: #247341;
+}
+
+.my-orders-card .my-orders-status-arranged {
+  background: #e4eef9;
+  color: #315d86;
+}
+
+.my-orders-card .my-orders-status-completed {
+  background: #dcefd5;
+  color: #175b2b;
 }
 
 .my-orders-card .my-orders-status-rejected {
@@ -636,6 +656,7 @@
   color: #946822;
 }
 
+.my-orders-fulfilment-status.fulfilment-declined,
 .my-orders-fulfilment-status.fulfilment-cancelled {
   background: #fde8e8;
   color: #a33333;

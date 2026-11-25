@@ -5,6 +5,8 @@ import './MyOrders.css'
 type OrderStatus =
   | 'SUBMITTED'
   | 'ACCEPTED'
+  | 'ARRANGED'
+  | 'COMPLETED'
   | 'REJECTED'
   | 'CANCELLED'
 
@@ -14,6 +16,7 @@ type FulfilmentMethod = 'PICKUP' | 'DELIVERY'
 type FulfilmentStatus =
   | 'PENDING'
   | 'CONFIRMED'
+  | 'DECLINED'
   | 'CANCELLED'
 
 type FulfilmentArrangement = {
@@ -53,6 +56,8 @@ const filters: { key: OrderFilter; label: string }[] = [
   { key: 'ALL', label: 'All Orders' },
   { key: 'SUBMITTED', label: 'Pending' },
   { key: 'ACCEPTED', label: 'Accepted' },
+  { key: 'ARRANGED', label: 'Arranged' },
+  { key: 'COMPLETED', label: 'Completed' },
   { key: 'CANCELLED', label: 'Cancelled' },
   { key: 'REJECTED', label: 'Declined' },
 ]
@@ -100,6 +105,8 @@ function normalizeStatus(value: unknown): OrderStatus {
 
   if (
     status === 'ACCEPTED' ||
+    status === 'ARRANGED' ||
+    status === 'COMPLETED' ||
     status === 'REJECTED' ||
     status === 'CANCELLED'
   ) {
@@ -230,6 +237,10 @@ function statusLabel(status: OrderStatus): string {
       return 'Pending'
     case 'ACCEPTED':
       return 'Accepted'
+    case 'ARRANGED':
+      return 'Arranged'
+    case 'COMPLETED':
+      return 'Completed'
     case 'REJECTED':
       return 'Declined'
     case 'CANCELLED':
@@ -416,6 +427,13 @@ export default function MyOrders({
         [requestId]: arrangement,
       }))
 
+      if (arrangement?.status === 'CONFIRMED') {
+        setRequests(previous => previous.map(request =>
+          request.id === requestId && request.status === 'ACCEPTED'
+            ? { ...request, status: 'ARRANGED' }
+            : request
+        ))
+      }
       return arrangement
     } catch (err) {
       setArrangementError(
@@ -442,7 +460,7 @@ export default function MyOrders({
 
     setExpandedId(request.id)
 
-    if (request.status === 'ACCEPTED') {
+    if (['ACCEPTED', 'ARRANGED', 'COMPLETED'].includes(request.status)) {
     void loadArrangement(request.id)
   }
 }
@@ -450,6 +468,7 @@ export default function MyOrders({
   // RESTAURANT: Submit pickup/delivery arrangement
   async function handleCreateArrangement() {
     if (!arrangementOrderId || arrangementLoading) return
+    if (requests.find(request => request.id === arrangementOrderId)?.status !== 'ACCEPTED') return
 
     setArrangementError('')
 
@@ -661,6 +680,8 @@ export default function MyOrders({
       ACCEPTED: requests.filter(
         request => request.status === 'ACCEPTED'
       ).length,
+      ARRANGED: requests.filter(request => request.status === 'ARRANGED').length,
+      COMPLETED: requests.filter(request => request.status === 'COMPLETED').length,
       CANCELLED: requests.filter(
         request => request.status === 'CANCELLED'
       ).length,
@@ -732,6 +753,14 @@ export default function MyOrders({
           </div>
         </div>
 
+        <div className="my-orders-stat arranged-stat">
+          <div className="my-orders-stat-icon">↔</div>
+          <div><strong>{counts.ARRANGED}</strong><span>Arranged Orders</span></div>
+        </div>
+        <div className="my-orders-stat completed-stat">
+          <div className="my-orders-stat-icon">✓</div>
+          <div><strong>{counts.COMPLETED}</strong><span>Completed Orders</span></div>
+        </div>
         <div className="my-orders-stat cancelled-stat">
           <div className="my-orders-stat-icon">×</div>
           <div>
@@ -863,7 +892,7 @@ export default function MyOrders({
 
                   <span className="my-orders-row-quantity">{request.quantity}</span>
 
-                  <span>
+                  <span className="my-orders-row-price">
                     {formatPrice(request.totalPrice)}
                   </span>
 
@@ -923,7 +952,11 @@ export default function MyOrders({
 
                    
                     {(request.status === 'SUBMITTED' ||
-                    request.status === 'ACCEPTED') && (
+                    (request.status === 'ACCEPTED' &&
+                      !arrangementLoading &&
+                      !arrangementError &&
+                      arrangements[request.id] !== undefined &&
+                      arrangements[request.id]?.status !== 'CONFIRMED')) && (
 
                       <button
                         type="button"
@@ -939,10 +972,14 @@ onClick={() =>
 </button>
 )}
 
-{request.status === 'ACCEPTED' && (
+{['ACCEPTED', 'ARRANGED', 'COMPLETED'].includes(request.status) && (
   <>
     <p className="my-orders-status-note accepted">
-      ✓ The producer has accepted your request.
+      {request.status === 'COMPLETED'
+        ? '✓ This order has been completed.'
+        : request.status === 'ARRANGED'
+          ? '✓ Pickup or delivery has been confirmed.'
+          : '✓ The producer has accepted your request.'}
     </p>
 
     {arrangementLoading && arrangementOrderId !== request.id && (
@@ -968,7 +1005,8 @@ onClick={() =>
     </button>
   </div>
 )}
-{!arrangementLoading &&
+{request.status === 'ACCEPTED' &&
+  !arrangementLoading &&
   !arrangementError &&
   arrangements[request.id] === null &&
   arrangementOrderId !== request.id && (
@@ -1007,7 +1045,9 @@ onClick={() =>
             ? '✓ Confirmed by producer'
             : arrangements[request.id]?.status === 'PENDING'
               ? 'Awaiting producer confirmation'
-              : 'Cancelled'}
+              : arrangements[request.id]?.status === 'DECLINED'
+                ? 'Declined by producer'
+                : 'Cancelled'}
         </span>
       </div>
       <div className="my-orders-arrangement-details">
@@ -1031,7 +1071,7 @@ onClick={() =>
     </div>
   )}
 
-{arrangementOrderId === request.id &&
+{request.status === 'ACCEPTED' && arrangementOrderId === request.id &&
   arrangements[request.id] === null && (
     <div className="my-orders-arrangement-form">
       <h3>Arrange Pickup / Delivery</h3>
