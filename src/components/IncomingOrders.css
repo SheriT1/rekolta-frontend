@@ -74,7 +74,7 @@
 
 .incoming-stats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
   margin-bottom: 30px;
 }
@@ -127,6 +127,16 @@
 .accepted-stat .incoming-stat-icon {
   background: #e5f4e9;
   color: #276c43;
+}
+
+.incoming-stat.arranged-stat .incoming-stat-icon {
+  background: #e4eef9;
+  color: #315d86;
+}
+
+.incoming-stat.completed-stat .incoming-stat-icon {
+  background: #dcefd5;
+  color: #175b2b;
 }
 
 .cancelled-stat .incoming-stat-icon {
@@ -311,6 +321,16 @@
 .status-accepted {
   background: #e3f4e7;
   color: #247341;
+}
+
+.incoming-status.status-arranged {
+  background: #e4eef9;
+  color: #315d86;
+}
+
+.incoming-status.status-completed {
+  background: #dcefd5;
+  color: #175b2b;
 }
 
 .status-cancelled {
@@ -636,6 +656,7 @@
   color: #397348;
 }
 
+.incoming-fulfilment-status.fulfilment-declined,
 .fulfilment-cancelled {
   color: #a34740;
 }

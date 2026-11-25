@@ -5,6 +5,8 @@ import './IncomingOrders.css'
 type OrderStatus =
   | 'SUBMITTED'
   | 'ACCEPTED'
+  | 'ARRANGED'
+  | 'COMPLETED'
   | 'REJECTED'
   | 'CANCELLED'
 
@@ -14,6 +16,7 @@ type FulfilmentMethod = 'PICKUP' | 'DELIVERY'
 type FulfilmentStatus =
   | 'PENDING'
   | 'CONFIRMED'
+  | 'DECLINED'
   | 'CANCELLED'
 
 type FulfilmentArrangement = {
@@ -57,6 +60,8 @@ const filters: { key: OrderFilter; label: string }[] = [
   { key: 'ALL', label: 'All Orders' },
   { key: 'SUBMITTED', label: 'Pending' },
   { key: 'ACCEPTED', label: 'Accepted' },
+  { key: 'ARRANGED', label: 'Arranged' },
+  { key: 'COMPLETED', label: 'Completed' },
   { key: 'CANCELLED', label: 'Cancelled' },
   { key: 'REJECTED', label: 'Declined' },
 ]
@@ -211,6 +216,7 @@ export default function IncomingOrders({
     orderId: string
   ) {
     if (confirmingArrangementId || arrangementLoading) return
+    if (orders.find(order => order.id === orderId)?.status !== 'ACCEPTED') return
 
     const confirmed = window.confirm(
       'Are you sure you want to confirm this pickup/delivery arrangement?'
@@ -262,6 +268,11 @@ export default function IncomingOrders({
           `Could not confirm arrangement (HTTP ${response.status}).`
         )
       }
+
+      // Successful confirmation also transitions the purchase request.
+      setOrders(previous => previous.map(order =>
+        order.id === orderId ? { ...order, status: 'ARRANGED' } : order
+      ))
 
       // Reload the arrangement instead of assuming
       // the PATCH response contains JSON.
@@ -376,6 +387,8 @@ export default function IncomingOrders({
       ACCEPTED: orders.filter(
         order => order.status === 'ACCEPTED'
       ).length,
+      ARRANGED: orders.filter(order => order.status === 'ARRANGED').length,
+      COMPLETED: orders.filter(order => order.status === 'COMPLETED').length,
       CANCELLED: orders.filter(
         order => order.status === 'CANCELLED'
       ).length,
@@ -448,6 +461,22 @@ export default function IncomingOrders({
             <div>
               <strong>{counts.ACCEPTED}</strong>
               <span>Accepted Requests</span>
+            </div>
+          </div>
+
+          <div className="incoming-stat arranged-stat">
+            <div className="incoming-stat-icon">↔</div>
+            <div>
+              <strong>{counts.ARRANGED}</strong>
+              <span>Arranged Orders</span>
+            </div>
+          </div>
+
+          <div className="incoming-stat completed-stat">
+            <div className="incoming-stat-icon">✓</div>
+            <div>
+              <strong>{counts.COMPLETED}</strong>
+              <span>Completed Orders</span>
             </div>
           </div>
 
@@ -627,7 +656,7 @@ export default function IncomingOrders({
                             </button>
                           </div>
                 
-) : order.status === 'ACCEPTED' ? (
+) : (order.status === 'ACCEPTED' || order.status === 'ARRANGED' || order.status === 'COMPLETED') ? (
   <div className="incoming-arrangement">
     <button
       type="button"
@@ -666,7 +695,7 @@ onClick={() => {
                       </td>
                     </tr>
 
-        {order.status === 'ACCEPTED' &&
+        {(order.status === 'ACCEPTED' || order.status === 'ARRANGED' || order.status === 'COMPLETED') &&
         selectedArrangementOrderId === order.id && (
              <tr className="incoming-arrangement-row">
              <td colSpan={7}>
@@ -727,7 +756,7 @@ onClick={() => {
               </span>
             </p>
 
-            {arrangements[order.id]?.status === 'PENDING' && (
+            {order.status === 'ACCEPTED' && arrangements[order.id]?.status === 'PENDING' && (
               <button
                 type="button"
                 className="incoming-confirm-arrangement"
