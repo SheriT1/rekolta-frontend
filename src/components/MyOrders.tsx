@@ -15,6 +15,7 @@ type FulfilmentMethod = 'PICKUP' | 'DELIVERY'
 
 type FulfilmentStatus =
   | 'PENDING'
+  | 'COUNTERPROPOSED'
   | 'CONFIRMED'
   | 'DECLINED'
   | 'CANCELLED'
@@ -27,6 +28,13 @@ type FulfilmentArrangement = {
   pickup_point: string | null
   preferred_date: string
   preferred_time: string | null
+  message: string | null
+  counter_method: FulfilmentMethod | null
+  counter_delivery_address: string | null
+  counter_pickup_point: string | null
+  counter_preferred_date: string | null
+  counter_preferred_time: string | null
+  counter_message: string | null
   status: FulfilmentStatus
 }
 
@@ -313,6 +321,9 @@ export default function MyOrders({
   const [search, setSearch] = useState('')
 
   const cancellingRef = useRef(false)
+  const mutationRef = useRef(false)
+  const [message, setMessage] = useState('')
+  const [success, setSuccess] = useState('')
 
   useEffect(() => {
     const controller = new AbortController()
@@ -465,143 +476,63 @@ export default function MyOrders({
   }
 }
 
-  // RESTAURANT: Submit pickup/delivery arrangement
-  async function handleCreateArrangement() {
-    if (!arrangementOrderId || arrangementLoading) return
-    if (requests.find(request => request.id === arrangementOrderId)?.status !== 'ACCEPTED') return
-
-    setArrangementError('')
-
-    if (!preferredDate) {
-      setArrangementError('Please select a preferred date.')
-      return
+  async function mutate(requestId: string, action: 'save' | 'accept-counterproposal' | 'decline-counterproposal' | 'complete') {
+    if (mutationRef.current || cancellingRef.current || arrangementLoading) return
+    const arrangement = arrangements[requestId]
+    const status = requests.find(r => r.id === requestId)?.status
+    if (action === 'complete' ? status !== 'ARRANGED' || arrangement?.status !== 'CONFIRMED' : status !== 'ACCEPTED') return
+    if (action === 'save' && arrangement !== null && arrangement?.status !== 'DECLINED') return
+    if (action !== 'save' && action !== 'complete' && arrangement?.status !== 'COUNTERPROPOSED') return
+    if (action === 'save' && (!preferredDate || !fulfilmentLocation.trim())) {
+      setArrangementError('Please provide a date and location.'); return
     }
-
-    if (!fulfilmentLocation.trim()) {
-      setArrangementError(
-        fulfilmentMethod === 'PICKUP'
-          ? 'Please enter a pickup point.'
-          : 'Please enter a delivery address.'
-      )
-      return
-    }
-
+    if (action !== 'save' && !window.confirm(action === 'complete' ? 'Confirm that you have received the products?' : action === 'accept-counterproposal' ? 'Accept the producer’s alternative arrangement?' : 'Decline the alternative arrangement? You can submit a revised proposal.')) return
+    mutationRef.current = true
     setArrangementLoading(true)
-
+    setArrangementError('')
+    setSuccess('')
     try {
-      const requestBody = {
-        purchaseRequestId: arrangementOrderId,
-        method: fulfilmentMethod,
-        preferredDate,
-        ...(preferredTime.trim()
-          ? { preferredTime: preferredTime.trim() }
-          : {}),
-        ...(fulfilmentMethod === 'PICKUP'
-          ? { pickupPoint: fulfilmentLocation.trim() }
-          : { deliveryAddress: fulfilmentLocation.trim() }),
-      }
-
-      const response = await fetch(
-        `${API_URL}/fulfilment-arrangements`,
-        {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        }
-      )
-
+      const payload = action === 'save' ? {
+        ...(!arrangement ? { purchaseRequestId: requestId } : {}),
+        method: fulfilmentMethod, preferredDate,
+        ...(preferredTime ? { preferredTime } : {}),
+        ...(fulfilmentMethod === 'PICKUP' ? { pickupPoint: fulfilmentLocation.trim() } : { deliveryAddress: fulfilmentLocation.trim() }),
+        ...(message.trim() ? { message: message.trim() } : {}),
+      } : undefined
+      const url = action === 'complete' ? `/purchase-requests/${encodeURIComponent(requestId)}/complete` : action === 'save' && !arrangement ? '/fulfilment-arrangements' : `/fulfilment-arrangements/${encodeURIComponent(arrangement!.id)}/${action === 'save' ? 'revise' : action}`
+      const response = await fetch(API_URL + url, { method: action === 'save' && !arrangement ? 'POST' : 'PATCH', credentials: 'include', ...(payload ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) } : {}) })
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error(
-            'Your session has expired. Please log in again.'
-          )
-        }
-
-        if (response.status === 403) {
-          throw new Error(
-            'Only restaurant accounts can create arrangements.'
-          )
-        }
-
-        if (response.status === 404) {
-          throw new Error('Purchase request not found.')
-        }
-
-        if (response.status === 409) {
-          throw new Error(
-            'An arrangement already exists for this order.'
-          )
-        }
-
-        if (response.status === 400) {
-          throw new Error(
-            'Invalid arrangement details. Check the date, time and location.'
-          )
-        }
-
-        throw new Error(
-          `Could not create arrangement (HTTP ${response.status}).`
-        )
+        const data = await response.json().catch(() => null)
+        throw new Error(Array.isArray(data?.message) ? data.message.join(' ') : data?.message || `Request failed (HTTP ${response.status}).`)
       }
-
-
-      // The backend may return an empty response body
-      // even when the arrangement was saved successfully.
-      // Reload the saved arrangement using the GET endpoint.
-      const arrangementResponse = await fetch(
-        `${API_URL}/fulfilment-arrangements/request/${encodeURIComponent(
-          arrangementOrderId
-        )}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-        }
-      )
-
-      if (!arrangementResponse.ok) {
-        throw new Error(
-          'Arrangement was submitted, but could not be reloaded.'
-        )
-      }
-
-      const arrangement: FulfilmentArrangement | null =
-        await arrangementResponse.json()
-
-      if (!arrangement) {
-        throw new Error(
-          'Arrangement was submitted, but no saved arrangement was found.'
-        )
-      }
-
-      setArrangements(previous => ({
-        ...previous,
-        [arrangementOrderId]: arrangement,
-      }))
-
-
       setArrangementOrderId(null)
-      setPreferredDate('')
-      setPreferredTime('')
-      setFulfilmentLocation('')
-      setFulfilmentMethod('PICKUP')
-      setArrangementError('')
+      setSuccess(action === 'complete' ? 'Receipt confirmed. Order completed.' : action === 'accept-counterproposal' ? 'Alternative accepted. Order arranged.' : action === 'decline-counterproposal' ? 'Alternative declined. You can revise your proposal.' : 'Proposal submitted.')
+      if (action === 'complete' || action === 'accept-counterproposal') {
+        setRequests(old => old.map(r => r.id === requestId ? { ...r, status: action === 'complete' ? 'COMPLETED' : 'ARRANGED' } : r))
+        setFilter('ALL')
+      }
+      await loadArrangement(requestId)
     } catch (err) {
-      setArrangementError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to create pickup/delivery arrangement.'
-      )
+      setArrangementError(err instanceof Error ? err.message : 'Unable to update arrangement.')
     } finally {
+      mutationRef.current = false
       setArrangementLoading(false)
     }
   }
 
+  function openProposal(requestId: string) {
+    const a = arrangements[requestId]
+    setArrangementOrderId(requestId)
+    setFulfilmentMethod(a?.method || 'PICKUP')
+    setFulfilmentLocation(a ? (a.method === 'PICKUP' ? a.pickup_point : a.delivery_address) || '' : '')
+    setPreferredDate(a?.preferred_date.slice(0, 10) || '')
+    setPreferredTime(a?.preferred_time ? a.preferred_time.includes('T') ? a.preferred_time.slice(11,16) : a.preferred_time.slice(0,5) : '')
+    setMessage(a?.message || '')
+    setArrangementError('')
+  }
 
   async function handleCancelRequest(requestId: string) {
-    if (cancellingRef.current) return
+    if (cancellingRef.current || mutationRef.current || arrangementLoading) return
 
     const confirmed = window.confirm(
       'Are you sure you want to cancel this purchase request?'
@@ -737,59 +668,26 @@ export default function MyOrders({
         className="my-orders-stats"
         aria-label="Order statistics"
       >
-        <div className="my-orders-stat pending-stat">
-          <div className="my-orders-stat-icon">◷</div>
-          <div>
-            <strong>{counts.SUBMITTED}</strong>
-            <span>Pending Requests</span>
-          </div>
-        </div>
-
-        <div className="my-orders-stat accepted-stat">
-          <div className="my-orders-stat-icon">✓</div>
-          <div>
-            <strong>{counts.ACCEPTED}</strong>
-            <span>Accepted Requests</span>
-          </div>
-        </div>
-
-        <div className="my-orders-stat arranged-stat">
-          <div className="my-orders-stat-icon">↔</div>
-          <div><strong>{counts.ARRANGED}</strong><span>Arranged Orders</span></div>
-        </div>
-        <div className="my-orders-stat completed-stat">
-          <div className="my-orders-stat-icon">✓</div>
-          <div><strong>{counts.COMPLETED}</strong><span>Completed Orders</span></div>
-        </div>
-        <div className="my-orders-stat cancelled-stat">
-          <div className="my-orders-stat-icon">×</div>
-          <div>
-            <strong>{counts.CANCELLED}</strong>
-            <span>Cancelled Requests</span>
-          </div>
-        </div>
-
-        <div className="my-orders-stat declined-stat">
-          <div className="my-orders-stat-icon">×</div>
-          <div>
-            <strong>{counts.REJECTED}</strong>
-            <span>Declined Requests</span>
-          </div>
-        </div>
+        {filters.filter(item => item.key !== 'ALL').map(item => (
+          <button key={item.key} type="button" className={`my-orders-stat ${filter === item.key ? 'active' : ''}`} aria-pressed={filter === item.key} disabled={arrangementLoading || cancellingId !== null} onClick={() => { setFilter(item.key); setExpandedId(null); setArrangementOrderId(null) }}>
+            <span>{item.label}</span><strong>{counts[item.key]}</strong>
+          </button>
+        ))}
       </section>
 
       {/* Filters and Search */}
 
       <div className="my-orders-toolbar">
         <div className="my-orders-filters">
-          {filters.map(item => (
+          {filters.filter(item => item.key === 'ALL').map(item => (
             <button
               key={item.key}
               type="button"
               className={
                 filter === item.key ? 'active' : ''
               }
-              onClick={() => setFilter(item.key)}
+              disabled={arrangementLoading || cancellingId !== null}
+              onClick={() => { setFilter(item.key); setExpandedId(null); setArrangementOrderId(null) }}
             >
               {item.label} ({counts[item.key]})
             </button>
@@ -826,6 +724,7 @@ export default function MyOrders({
         </div>
 
         <div className="my-orders-requests-body">
+          {success && <p role="status" className="my-orders-status-note accepted">{success}</p>}
           {cancelError && (
             <div
               className="my-orders-error"
@@ -912,6 +811,7 @@ export default function MyOrders({
 
                 {expandedId === request.id && (
                   <div className="my-orders-details">
+                    {!['REJECTED','CANCELLED'].includes(request.status) && <ol className="my-orders-lifecycle" aria-label="Order progress">{(['SUBMITTED','ACCEPTED','ARRANGED','COMPLETED'] as const).map((step,i,steps) => { const current = steps.indexOf(request.status as typeof step); return <li key={step} className={i < current ? 'done' : i === current ? 'current' : ''} aria-current={i === current ? 'step' : undefined}><span className="my-orders-step-dot">{i < current ? '✓' : i+1}</span><span>{statusLabel(step)}</span></li> })}</ol>}
                     <div className="my-orders-detail-grid">
                       <div>
                         <span>Product</span>
@@ -1005,81 +905,40 @@ onClick={() =>
     </button>
   </div>
 )}
-{request.status === 'ACCEPTED' &&
-  !arrangementLoading &&
-  !arrangementError &&
-  arrangements[request.id] === null &&
-  arrangementOrderId !== request.id && (
-    <button
-      type="button"
-      className="my-orders-arrange-button"
-      disabled={cancellingId !== null}
-      onClick={() => {
-        setArrangementOrderId(request.id)
-        setFulfilmentMethod('PICKUP')
-        setPreferredDate('')
-        setPreferredTime('')
-        setFulfilmentLocation('')
-        setArrangementError('')
-      }}
-    >
-      Arrange Pickup / Delivery
-    </button>
-  )}
-
-{!arrangementLoading &&
-  !arrangementError &&
-  arrangements[request.id] && (
-    <div className="my-orders-arrangement-card">
-      <div className="my-orders-arrangement-header">
-        <h3>
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M2 4h13v13H2z M15 9h4l3 4v4h-7" />
-            <circle cx="6" cy="18" r="2" />
-            <circle cx="18" cy="18" r="2" />
-          </svg>
-          Pickup &amp; Delivery
-        </h3>
-        <span className={`my-orders-fulfilment-status fulfilment-${arrangements[request.id]?.status.toLowerCase()}`}>
-          {arrangements[request.id]?.status === 'CONFIRMED'
-            ? '✓ Confirmed by producer'
-            : arrangements[request.id]?.status === 'PENDING'
-              ? 'Awaiting producer confirmation'
-              : arrangements[request.id]?.status === 'DECLINED'
-                ? 'Declined by producer'
-                : 'Cancelled'}
-        </span>
-      </div>
-      <div className="my-orders-arrangement-details">
-        <div className="my-orders-arrangement-field">
-          <span>Method</span>
-          <strong>{arrangements[request.id]?.method === 'PICKUP' ? 'Pickup' : 'Delivery'}</strong>
-        </div>
-        <div className="my-orders-arrangement-field">
-          <span>{arrangements[request.id]?.method === 'PICKUP' ? 'Pickup point' : 'Delivery address'}</span>
-          <strong>{(arrangements[request.id]?.method === 'PICKUP' ? arrangements[request.id]?.pickup_point : arrangements[request.id]?.delivery_address) || 'Not specified'}</strong>
-        </div>
-        <div className="my-orders-arrangement-field">
-          <span>Preferred date</span>
-          <strong>{arrangements[request.id]?.preferred_date ? new Date(arrangements[request.id]!.preferred_date).toLocaleDateString('en-GB', {day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC'}) : 'Not specified'}</strong>
-        </div>
-        <div className="my-orders-arrangement-field">
-          <span>Preferred time</span>
-          <strong>{arrangements[request.id]?.preferred_time ? arrangements[request.id]!.preferred_time!.slice(11, 16) : 'Not specified'}</strong>
-        </div>
-      </div>
+{!arrangementLoading && !arrangementError && arrangements[request.id] && (() => {
+  const a = arrangements[request.id]!
+  const counter = Boolean(a.counter_method && a.counter_preferred_date)
+  const agreed = a.status === 'CONFIRMED' && counter
+  const details = (alternative: boolean) => {
+    const method = alternative ? a.counter_method : a.method
+    const location = alternative ? (method === 'PICKUP' ? a.counter_pickup_point : a.counter_delivery_address) : (method === 'PICKUP' ? a.pickup_point : a.delivery_address)
+    const date = alternative ? a.counter_preferred_date : a.preferred_date
+    const time = alternative ? a.counter_preferred_time : a.preferred_time
+    const note = alternative ? a.counter_message : a.message
+    return <div className="my-orders-arrangement-details">
+      {[[ 'Method', method === 'PICKUP' ? 'Pickup' : 'Delivery'], ['Location', location], ['Date', date ? new Date(date).toLocaleDateString('en-GB', {timeZone:'UTC'}) : null], ['Time', time ? time.includes('T') ? time.slice(11,16) : time.slice(0,5) : null], ...(note ? [['Message',note]] : [])].map(([label,value]) => <div className="my-orders-arrangement-field" key={label}><span>{label}</span><strong>{value || 'Not specified'}</strong></div>)}
     </div>
-  )}
+  }
+  return <div className="my-orders-arrangement-card">
+    <h3>Pickup &amp; Delivery</h3>
+    <span className={`my-orders-fulfilment-status fulfilment-${a.status.toLowerCase()}`}>{a.status === 'COUNTERPROPOSED' ? 'Producer suggested changes' : a.status === 'PENDING' ? 'Awaiting producer confirmation' : a.status === 'CONFIRMED' ? 'Confirmed' : a.status === 'DECLINED' ? 'Proposal declined' : 'Cancelled'}</span>
+    <h4>{a.status === 'CONFIRMED' ? 'Agreed arrangement' : 'Your proposal'}</h4>{details(agreed)}
+    {counter && !agreed && <><h4>Producer alternative proposal</h4>{details(true)}</>}
+    {request.status === 'ACCEPTED' && a.status === 'COUNTERPROPOSED' && <div className="my-orders-negotiation-actions"><button className="my-orders-arrange-button" disabled={cancellingId !== null} onClick={() => void mutate(request.id,'accept-counterproposal')}>Accept Alternative</button><button className="my-orders-cancel-button" disabled={cancellingId !== null} onClick={() => void mutate(request.id,'decline-counterproposal')}>Decline Alternative</button></div>}
+    {request.status === 'ARRANGED' && a.status === 'CONFIRMED' && <button className="my-orders-arrange-button" onClick={() => void mutate(request.id,'complete')}>Confirm Receipt</button>}
+  </div>
+})()}
+{request.status === 'ACCEPTED' && !arrangementLoading && !arrangementError && (arrangements[request.id] === null || arrangements[request.id]?.status === 'DECLINED') && arrangementOrderId !== request.id && <button className="my-orders-arrange-button" disabled={cancellingId !== null} onClick={() => openProposal(request.id)}>{arrangements[request.id] ? 'Revise Proposal' : 'Arrange Pickup / Delivery'}</button>}
 
 {request.status === 'ACCEPTED' && arrangementOrderId === request.id &&
-  arrangements[request.id] === null && (
+  (arrangements[request.id] === null || arrangements[request.id]?.status === 'DECLINED') && (
     <div className="my-orders-arrangement-form">
-      <h3>Arrange Pickup / Delivery</h3>
+      <h3>{arrangements[request.id] ? 'Revise Proposal' : 'Arrange Pickup / Delivery'}</h3>
 
       <form
         onSubmit={event => {
           event.preventDefault()
-          void handleCreateArrangement()
+          void mutate(request.id, 'save')
         }}
       >
         <label htmlFor="fulfilment-method">
@@ -1150,9 +1009,11 @@ onClick={() =>
           }
         />
 
+        <label htmlFor="fulfilment-message">Message (optional)</label>
+        <textarea id="fulfilment-message" maxLength={500} rows={3} value={message} onChange={event => setMessage(event.target.value)} />
         <button
           type="submit"
-          disabled={arrangementLoading}
+          disabled={arrangementLoading || cancellingId !== null}
         >
           Submit Arrangement
         </button>
