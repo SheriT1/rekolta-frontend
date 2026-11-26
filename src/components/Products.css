@@ -1,0 +1,776 @@
+
+/* ==========================================
+   REKOLTA MARKETPLACE
+   Harvest Collection
+   ========================================== */
+
+.rk-market-page {
+  --market-forest: #18482f;
+  --market-green: #216832;
+  --market-cream: #fafbf5;
+  --market-white: #fffefa;
+  --market-sage: #dfe9d5;
+  --market-border: #8fa786;
+  --market-muted: #344f3c;
+
+  min-height: 100vh;
+  padding: 32px 24px 72px;
+  background: var(--market-cream);
+  color: var(--market-forest);
+}
+
+.rk-market-page,
+.rk-market-page * {
+  box-sizing: border-box;
+}
+
+.rk-market-container {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+/* ==========================================
+   MARKETPLACE HERO
+   ========================================== */
+
+.rk-market-hero {
+  padding: 38px 44px 42px;
+  border-radius: 20px;
+  background: var(--market-forest);
+  color: #ffffff;
+}
+
+.rk-market-hero-content {
+  max-width: 760px;
+}
+
+.rk-market-eyebrow {
+  display: block;
+  margin-bottom: 14px;
+  color: #d5e9c8;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.rk-market-hero h1 {
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(40px, 4.5vw, 64px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+}
+
+.rk-market-hero p {
+  margin: 0;
+  color: #f0f5eb;
+  font-size: 21px;
+  line-height: 1.6;
+}
+
+/* Search field */
+
+.rk-market-search {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  max-width: 640px;
+  min-height: 58px;
+  margin-top: 25px;
+  padding: 0 17px;
+  border: 1px solid #d3e0c9;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--market-forest);
+}
+
+.rk-market-search svg {
+  flex-shrink: 0;
+}
+
+.rk-market-search input {
+  width: 100%;
+  min-width: 0;
+  padding: 15px 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--market-forest);
+  font: inherit;
+  font-size: 19px;
+}
+
+.rk-market-search input::placeholder {
+  color: #526b56;
+}
+
+.rk-market-search:focus-within {
+  outline: 3px solid #b8d59f;
+  outline-offset: 3px;
+}
+
+/* ==========================================
+   FILTER PANEL
+   ========================================== */
+
+.rk-market-filters {
+  margin-top: 24px;
+  padding: 23px 26px 26px;
+  border: 1px solid #a8bda0;
+  border-radius: 14px;
+  background: #e8eedf;
+}
+
+.rk-market-filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 21px;
+}
+
+.rk-market-filter-header h2 {
+  margin: 0;
+  color: var(--market-forest);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 29px;
+  font-weight: 700;
+}
+
+.rk-market-reset {
+  flex-shrink: 0;
+  padding: 5px 0;
+  border: none;
+  background: transparent;
+  color: var(--market-forest);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+}
+
+.rk-market-reset:hover {
+  color: var(--market-green);
+}
+
+.rk-market-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.rk-market-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+
+.rk-market-field label {
+  color: var(--market-forest);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.rk-market-field select,
+.rk-market-field input {
+  width: 100%;
+  min-width: 0;
+  height: 50px;
+  padding: 0 13px;
+  border: 1px solid #819b77;
+  border-radius: 8px;
+  background: var(--market-white);
+  color: var(--market-forest);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 500;
+  outline: none;
+}
+
+.rk-market-field select {
+  cursor: pointer;
+}
+
+.rk-market-field input::placeholder {
+  color: #526b56;
+}
+
+.rk-market-field select:focus,
+.rk-market-field input:focus {
+  border-color: var(--market-green);
+  box-shadow: 0 0 0 3px rgba(39, 125, 59, 0.1);
+}
+
+/* Minimum and maximum price */
+
+.rk-market-price-range {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+}
+
+.rk-market-price-range > span {
+  color: var(--market-muted);
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.rk-market-price-range input {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.rk-market-price-range input::-webkit-inner-spin-button,
+.rk-market-price-range input::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.rk-market-price-range input[aria-invalid='true'] {
+  border-color: #b75a50;
+}
+
+/* ==========================================
+   COLLECTION HEADING
+   ========================================== */
+
+.rk-market-collection {
+  margin-top: 36px;
+}
+
+.rk-market-results-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.rk-market-collection-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--market-green);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1.7px;
+  text-transform: uppercase;
+}
+
+.rk-market-results-header h2 {
+  margin: 0 0 8px;
+  color: var(--market-forest);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(34px, 3.5vw, 46px);
+  line-height: 1.15;
+  letter-spacing: -0.7px;
+}
+
+.rk-market-results-header p {
+  margin: 0;
+  color: var(--market-muted);
+  font-size: 19px;
+  font-weight: 500;
+}
+
+/* ==========================================
+   PRODUCT GRID
+   ========================================== */
+
+.rk-market-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 26px;
+}
+
+/* Product card */
+
+.rk-market-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--market-border);
+  border-radius: 18px;
+  background: var(--market-white);
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.rk-market-card:hover {
+  transform: translateY(-3px);
+  border-color: #7f9e76;
+  box-shadow: 0 6px 18px rgba(24, 72, 47, 0.07);
+}
+
+/* ==========================================
+   CARD IMAGE SECTION
+   ========================================== */
+
+.rk-market-card-top {
+  padding: 15px 18px 0;
+  background: var(--market-sage);
+}
+
+.rk-market-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 42px;
+  margin-bottom: 13px;
+}
+
+.rk-market-category {
+  color: var(--market-forest);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+/* Favorite button */
+
+.rk-market-card-heading .rk-favorite-button {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+}
+
+/* Product photograph */
+
+.rk-market-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 5 / 4;
+  overflow: hidden;
+  border-radius: 11px;
+  background: #edf2e6;
+}
+
+.rk-market-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.rk-market-no-photo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--market-muted);
+}
+
+.rk-market-no-photo > span {
+  font-size: 48px;
+}
+
+.rk-market-no-photo p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* Curved green-to-cream transition */
+
+.rk-market-wave {
+  display: block;
+  flex-shrink: 0;
+  width: 100%;
+  height: 22px;
+  margin-top: -1px;
+  background: var(--market-white);
+}
+
+/* ==========================================
+   CARD INFORMATION
+   ========================================== */
+
+.rk-market-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  padding: 15px 22px 22px;
+}
+
+.rk-market-quality {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--market-green);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.rk-market-card-body h3 {
+  margin: 0 0 12px;
+  color: var(--market-forest);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(30px, 2.6vw, 36px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.6px;
+  overflow-wrap: anywhere;
+}
+
+.rk-market-producer {
+  margin: 0 0 7px;
+  color: var(--market-forest);
+  font-size: 20px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.rk-market-location {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 19px;
+  color: var(--market-muted);
+  font-size: 18px;
+}
+
+.rk-market-location svg {
+  flex-shrink: 0;
+  width: 21px;
+  height: 21px;
+  color: var(--market-green);
+}
+
+.rk-market-location span {
+  overflow-wrap: anywhere;
+}
+
+/* Available quantity */
+
+.rk-market-availability {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  margin-top: auto;
+  margin-bottom: 20px;
+  padding: 10px 13px;
+  border-radius: 7px;
+  background: #eaf0e2;
+  color: var(--market-forest);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.rk-market-stock-dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--market-green);
+}
+
+/* ==========================================
+   PRICE AND PRODUCT ACTION
+   ========================================== */
+
+.rk-market-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding-top: 19px;
+  border-top: 1px solid #c9d6bf;
+}
+
+.rk-market-price {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.rk-market-price strong {
+  color: var(--market-forest);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(30px, 2.8vw, 38px);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.rk-market-price > span {
+  color: var(--market-muted);
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.rk-market-details-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  gap: 10px;
+  min-height: 50px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--market-forest);
+  color: #ffffff;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.rk-market-details-button:hover {
+  background: #286044;
+}
+
+.rk-market-details-button svg {
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   LOADING, EMPTY AND ERROR STATES
+   ========================================== */
+
+.rk-market-message {
+  padding: 55px 24px;
+  border: 1px solid #c9d6bf;
+  border-radius: 14px;
+  background: var(--market-white);
+  color: var(--market-muted);
+  text-align: center;
+  font-size: 19px;
+}
+
+.rk-market-message h3 {
+  margin: 0 0 12px;
+  color: var(--market-forest);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 28px;
+}
+
+.rk-market-message p {
+  margin: 0 0 22px;
+}
+
+.rk-market-error {
+  margin: 15px 0;
+  padding: 12px 15px;
+  border: 1px solid #e3b9b0;
+  border-radius: 8px;
+  background: #fff3ef;
+  color: #9f382c;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   ACCESSIBILITY
+   ========================================== */
+
+.rk-market-page button:focus-visible {
+  outline: 3px solid #83ad73;
+  outline-offset: 3px;
+}
+
+/* ==========================================
+   RESPONSIVE DESIGN
+   ========================================== */
+
+/* Smaller desktop screens */
+
+@media (max-width: 1100px) {
+  .rk-market-grid {
+    gap: 20px;
+  }
+
+  .rk-market-card-body {
+    padding-right: 17px;
+    padding-left: 17px;
+  }
+
+  .rk-market-filter-grid {
+    gap: 16px;
+  }
+
+  .rk-market-card-footer {
+    gap: 10px;
+  }
+
+  .rk-market-details-button {
+    gap: 7px;
+    padding: 12px;
+    font-size: 16px;
+  }
+}
+
+/* Tablet */
+
+@media (max-width: 1000px) {
+  .rk-market-filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+
+  .rk-market-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rk-market-card-body {
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 650px) {
+  .rk-market-page {
+    padding: 20px 16px 48px;
+  }
+
+  .rk-market-hero {
+    padding: 28px 24px;
+    border-radius: 16px;
+  }
+
+  .rk-market-hero h1 {
+    font-size: 38px;
+  }
+
+  .rk-market-hero p {
+    font-size: 18px;
+  }
+
+  .rk-market-search {
+    margin-top: 22px;
+  }
+
+  .rk-market-search input {
+    font-size: 17px;
+  }
+
+  .rk-market-filters {
+    padding: 20px;
+  }
+
+  .rk-market-filter-header h2 {
+    font-size: 24px;
+  }
+
+  .rk-market-field label {
+    font-size: 17px;
+  }
+
+  .rk-market-reset {
+    font-size: 15px;
+  }
+
+  .rk-market-grid {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .rk-market-collection {
+    margin-top: 28px;
+  }
+
+  .rk-market-card-body h3 {
+    font-size: 32px;
+  }
+
+  .rk-market-price strong {
+    font-size: 34px;
+  }
+
+  .rk-market-details-button {
+    padding-right: 17px;
+    padding-left: 17px;
+    font-size: 16px;
+  }
+}
+
+/* Small mobile screens */
+
+@media (max-width: 480px) {
+  .rk-market-filter-grid {
+    grid-template-columns: 1fr;
+    gap: 17px;
+  }
+
+  .rk-market-filter-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .rk-market-filter-header h2 {
+    font-size: 23px;
+  }
+
+  .rk-market-hero h1 {
+    font-size: 34px;
+  }
+
+  .rk-market-card-top {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .rk-market-card-body {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .rk-market-card-footer {
+    flex-wrap: wrap;
+  }
+
+  .rk-market-card-footer .rk-market-details-button {
+    flex-grow: 1;
+  }
+}
+
+/* Extra small mobile screens */
+
+@media (max-width: 360px) {
+  .rk-market-card-footer .rk-market-details-button {
+    width: 100%;
+  }
+
+  .rk-market-filter-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+/* Reduced motion preference */
+
+@media (prefers-reduced-motion: reduce) {
+  .rk-market-card,
+  .rk-market-details-button {
+    transition: none;
+  }
+
+  .rk-market-card:hover {
+    transform: none;
+  }
+}
