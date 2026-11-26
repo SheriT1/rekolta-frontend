@@ -14,8 +14,7 @@ type AuthUser = {
   role: UserRole
 }
 
-const API_URL = `http://${window.location.hostname}:3000`;
-
+const API_URL = `http://${window.location.hostname}:3000`
 
 type AuthProps = {
   currentUser: AuthUser | null
@@ -24,9 +23,8 @@ type AuthProps = {
   onBrowseProducts: () => void
   onViewAllRequests: () => void
   onViewIncomingOrders: () => void
+  onViewFavorites: () => void
 }
-
-
 
 export default function Auth({
   currentUser,
@@ -35,6 +33,7 @@ export default function Auth({
   onBrowseProducts,
   onViewAllRequests,
   onViewIncomingOrders,
+  onViewFavorites,
 }: AuthProps) {
   const [mode, setMode] = useState<AuthMode>('login')
   const [role, setRole] = useState<UserRole>('PRODUCER')
@@ -183,12 +182,12 @@ export default function Auth({
     <main className="auth-page">
       <section
         className={
-        currentUser
-          ? 'auth-card auth-card--producer'
-          : 'auth-card'
+          currentUser
+            ? 'auth-card auth-card--producer'
+            : 'auth-card'
         }
       >
-    {!currentUser && (
+        {!currentUser && (
           <>
             <h1>Rekolta</h1>
             <p>Connecting local producers and restaurants</p>
@@ -197,18 +196,18 @@ export default function Auth({
 
         {currentUser ? (
           <div className="auth-account">
-         {currentUser.role === 'PRODUCER' ? (
-        <ProducerDashboard
-        fullName={currentUser.fullName}
-        onManageProducts={onManageProducts}
-        onViewOrders={onViewIncomingOrders}
-        />
-
+            {currentUser.role === 'PRODUCER' ? (
+              <ProducerDashboard
+                fullName={currentUser.fullName}
+                onManageProducts={onManageProducts}
+                onViewOrders={onViewIncomingOrders}
+              />
             ) : currentUser.role === 'RESTAURANT' ? (
-            <RestaurantDashboard
-             fullName={currentUser.fullName}
-             onBrowseProducts={onBrowseProducts}
-             onViewAllRequests={onViewAllRequests}
+              <RestaurantDashboard
+                fullName={currentUser.fullName}
+                onBrowseProducts={onBrowseProducts}
+                onViewAllRequests={onViewAllRequests}
+                onViewFavorites={onViewFavorites}
               />
             ) : (
               <AdminDashboard fullName={currentUser.fullName} />

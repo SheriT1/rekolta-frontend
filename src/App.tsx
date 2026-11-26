@@ -1,5 +1,4 @@
 
-
 import { useEffect, useState } from 'react'
 import Home from './components/Home'
 import Navbar from './components/Navbar'
@@ -9,6 +8,7 @@ import Auth from './components/Auth'
 import MyProducts from './components/MyProducts'
 import MyOrders from './components/MyOrders'
 import IncomingOrders from './components/IncomingOrders'
+import MyFavorites from './components/MyFavorites'
 import './App.css'
 
 type Page =
@@ -20,6 +20,7 @@ type Page =
   | 'my-products'
   | 'my-orders'
   | 'incoming-orders'
+  | 'my-favorites'
 
 type AuthUser = {
   id: string
@@ -28,9 +29,10 @@ type AuthUser = {
   role: 'PRODUCER' | 'RESTAURANT' | 'ADMIN'
 }
 
-const API_URL = 'http://localhost:3000'
+const API_URL = `http://${window.location.hostname}:3000`
 
 function App() {
+  const [returnToFavorites, setReturnToFavorites] = useState(false)
   const [page, setPage] = useState<Page>('home')
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null)
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
@@ -123,13 +125,18 @@ function App() {
   }
 
   const handleViewProductDetails = (productId: string) => {
+    setReturnToFavorites(page === 'my-favorites')
     setSelectedProductId(productId)
     setPage('product-details')
   }
 
   const handleBackToProducts = () => {
     setSelectedProductId(null)
-    setPage('products')
+    setPage(
+      returnToFavorites && currentUser?.role === 'RESTAURANT'
+        ? 'my-favorites'
+        : 'products'
+    )
   }
 
   return (
@@ -154,8 +161,21 @@ function App() {
 
       {/* Products */}
       {page === 'products' && (
-        <Products onViewDetails={handleViewProductDetails} />
+        <Products
+          onViewDetails={handleViewProductDetails}
+          isRestaurant={currentUser?.role === 'RESTAURANT'}
+        />
       )}
+
+      {/* Restaurant: My Favorites */}
+      {page === 'my-favorites' &&
+        currentUser?.role === 'RESTAURANT' && (
+          <MyFavorites
+            onViewDetails={handleViewProductDetails}
+            onBack={() => setPage('dashboard')}
+            onBrowse={() => setPage('products')}
+          />
+        )}
 
       {/* Product Details */}
       {page === 'product-details' && selectedProductId && (
@@ -179,6 +199,11 @@ function App() {
             }
           }}
           onViewIncomingOrders={handleViewIncomingOrders}
+          onViewFavorites={() => {
+            if (currentUser?.role === 'RESTAURANT') {
+              setPage('my-favorites')
+            }
+          }}
         />
       )}
 
@@ -211,5 +236,3 @@ function App() {
 }
 
 export default App
-
-
