@@ -1,7 +1,16 @@
-
 import { useState, type FormEvent } from 'react'
 
 const API_URL = `http://${window.location.hostname}:3000`
+
+const qualityOptions = [
+  { value: 'LOW', label: 'Low' },
+  { value: 'STANDARD', label: 'Standard' },
+  { value: 'HIGH', label: 'High' },
+  { value: 'PREMIUM', label: 'Premium' },
+]
+
+const isValidQuality = (value: string | null | undefined) =>
+  qualityOptions.some((option) => option.value === value)
 
 const categories = [
   {
@@ -89,7 +98,9 @@ export default function AddProduct({
       description: productToEdit.description ?? '',
       price: String(productToEdit.price),
       unit: productToEdit.unit,
-      quality: productToEdit.quality ?? '',
+      quality: isValidQuality(productToEdit.quality)
+        ? productToEdit.quality ?? ''
+        : '',
       availableQuantity: String(
         productToEdit.available_quantity ??
         productToEdit.availableQuantity ??
@@ -150,6 +161,11 @@ const handleImageSelection = (
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError('')
+
+    if (!isValidQuality(form.quality)) {
+      setError('Please select a valid product quality.')
+      return
+    }
 
     if (form.availableUntil < form.availableFrom) {
       setError(
@@ -468,17 +484,28 @@ onProductCreated()
                 <label htmlFor="product-quality">
                   Quality *
                 </label>
-                <input
+                <select
                   id="product-quality"
-                  type="text"
-                  maxLength={100}
-                  placeholder="e.g. Fresh, Grade A"
                   value={form.quality}
                   onChange={(event) =>
                     updateField('quality', event.target.value)
                   }
                   required
-                />
+                >
+                  <option value="" disabled>Select product quality</option>
+                  {qualityOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                {productToEdit?.quality &&
+                  !isValidQuality(productToEdit.quality) && (
+                    <p>
+                      Previous quality: {productToEdit.quality}. Please select
+                      one of the standard quality levels.
+                    </p>
+                  )}
               </div>
             </div>
           </div>
