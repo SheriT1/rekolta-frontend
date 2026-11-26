@@ -15,6 +15,7 @@ type FulfilmentMethod = 'PICKUP' | 'DELIVERY'
 
 type FulfilmentStatus =
   | 'PENDING'
+  | 'COUNTERPROPOSED'
   | 'CONFIRMED'
   | 'DECLINED'
   | 'CANCELLED'
@@ -27,6 +28,13 @@ type FulfilmentArrangement = {
   pickup_point: string | null
   preferred_date: string
   preferred_time: string | null
+  message: string | null
+  counter_method: FulfilmentMethod | null
+  counter_delivery_address: string | null
+  counter_pickup_point: string | null
+  counter_preferred_date: string | null
+  counter_preferred_time: string | null
+  counter_message: string | null
   status: FulfilmentStatus
 }
 
@@ -72,6 +80,7 @@ export default function IncomingOrders({
   const [orders, setOrders] = useState<IncomingOrder[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [actionError, setActionError] = useState('')
   const [processingId, setProcessingId] = useState<string | null>(null)
   const [filter, setFilter] = useState<OrderFilter>('ALL')
@@ -96,6 +105,10 @@ export default function IncomingOrders({
     useState<string | null>(null)
 
 
+  const [proposal, setProposal] = useState<{
+    method: FulfilmentMethod; location: string; date: string; time: string; message: string
+  } | null>(null)
+  const arrangementBusy = useRef(false)
   const processingRef = useRef(false)
 
   const loadOrders = async (signal?: AbortSignal) => {
@@ -210,91 +223,52 @@ export default function IncomingOrders({
   }
 
 
-  // PRODUCER: Confirm pickup/delivery arrangement
-  async function handleConfirmArrangement(
+  async function handleArrangementAction(
     arrangementId: string,
-    orderId: string
+    orderId: string,
+    action: 'confirm' | 'decline' | 'counterproposal'
   ) {
-    if (confirmingArrangementId || arrangementLoading) return
-    if (orders.find(order => order.id === orderId)?.status !== 'ACCEPTED') return
-
-    const confirmed = window.confirm(
-      'Are you sure you want to confirm this pickup/delivery arrangement?'
-    )
-
-    if (!confirmed) return
-
+    if (arrangementBusy.current || arrangementLoading) return
+    if (orders.find(order => order.id === orderId)?.status !== 'ACCEPTED' ||
+        arrangements[orderId]?.status !== 'PENDING') return
+    if (action === 'counterproposal' && (!proposal || !proposal.location.trim() || !proposal.date)) {
+      setArrangementError('Please provide a location and date.')
+      return
+    }
+    if (action !== 'counterproposal' && !window.confirm(
+      action === 'confirm' ? 'Confirm this arrangement?' : 'Decline this arrangement? The order will remain accepted.'
+    )) return
+    const payload = action === 'counterproposal' && proposal ? {
+      method: proposal.method,
+      preferredDate: proposal.date,
+      ...(proposal.time ? { preferredTime: proposal.time } : {}),
+      ...(proposal.method === 'PICKUP' ? { pickupPoint: proposal.location.trim() } : { deliveryAddress: proposal.location.trim() }),
+      ...(proposal.message.trim() ? { message: proposal.message.trim() } : {}),
+    } : undefined
+    arrangementBusy.current = true
     setConfirmingArrangementId(arrangementId)
     setArrangementError('')
-
     try {
-      const response = await fetch(
-        `${API_URL}/fulfilment-arrangements/${encodeURIComponent(
-          arrangementId
-        )}/confirm`,
-        {
-          method: 'PATCH',
-          credentials: 'include',
-        }
-      )
-
+      const response = await fetch(`${API_URL}/fulfilment-arrangements/${encodeURIComponent(arrangementId)}/${action}`, {
+        method: 'PATCH', credentials: 'include',
+        ...(payload ? { headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) } : {}),
+      })
       if (!response.ok) {
-        if (response.status === 401) {
-          throw new Error(
-            'Your session has expired. Please log in again.'
-          )
-        }
-
-        if (response.status === 403) {
-          throw new Error(
-            'You are not allowed to confirm this arrangement.'
-          )
-        }
-
-        if (response.status === 404) {
-          throw new Error('Arrangement not found.')
-        }
-
-        if (
-          response.status === 400 ||
-          response.status === 409
-        ) {
-          throw new Error(
-            'This arrangement can no longer be confirmed. Please refresh the details.'
-          )
-        }
-
-        throw new Error(
-          `Could not confirm arrangement (HTTP ${response.status}).`
-        )
+        const data = await response.json().catch(() => null)
+        throw new Error(Array.isArray(data?.message) ? data.message.join(' ') : data?.message || `Request failed (HTTP ${response.status}).`)
       }
-
-      // Successful confirmation also transitions the purchase request.
-      setOrders(previous => previous.map(order =>
-        order.id === orderId ? { ...order, status: 'ARRANGED' } : order
-      ))
-
-      // Reload the arrangement instead of assuming
-      // the PATCH response contains JSON.
-      const updatedArrangement =
-        await loadArrangement(orderId)
-
-      if (updatedArrangement?.status !== 'CONFIRMED') {
-        throw new Error(
-          'Confirmation was submitted, but the confirmed status could not be verified. Please reload the arrangement.'
-        )
-      }
+      setProposal(null)
+      setSuccess(action === 'confirm' ? 'Arrangement confirmed. The order is now Arranged.' : action === 'decline' ? 'Arrangement declined. The order remains Accepted.' : 'Alternative proposal sent to the restaurant.')
+      if (action === 'confirm') setOrders(previous => previous.map(order => order.id === orderId ? { ...order, status: 'ARRANGED' } : order))
+      await loadArrangement(orderId)
+      await loadOrders()
     } catch (err) {
-      setArrangementError(
-        err instanceof Error
-          ? err.message
-          : 'Unable to confirm the arrangement.'
-      )
+      setArrangementError(err instanceof Error ? err.message : 'Unable to update arrangement.')
     } finally {
+      arrangementBusy.current = false
       setConfirmingArrangementId(null)
     }
   }
-
 
   async function handleOrderAction(
     id: string,
@@ -447,70 +421,26 @@ export default function IncomingOrders({
       <div className="incoming-content">
         {/* Statistics */}
 
-        <div className="incoming-stats">
-          <div className="incoming-stat pending-stat">
-            <div className="incoming-stat-icon">◷</div>
-            <div>
-              <strong>{counts.SUBMITTED}</strong>
-              <span>Pending Requests</span>
-            </div>
-          </div>
-
-          <div className="incoming-stat accepted-stat">
-            <div className="incoming-stat-icon">✓</div>
-            <div>
-              <strong>{counts.ACCEPTED}</strong>
-              <span>Accepted Requests</span>
-            </div>
-          </div>
-
-          <div className="incoming-stat arranged-stat">
-            <div className="incoming-stat-icon">↔</div>
-            <div>
-              <strong>{counts.ARRANGED}</strong>
-              <span>Arranged Orders</span>
-            </div>
-          </div>
-
-          <div className="incoming-stat completed-stat">
-            <div className="incoming-stat-icon">✓</div>
-            <div>
-              <strong>{counts.COMPLETED}</strong>
-              <span>Completed Orders</span>
-            </div>
-          </div>
-
-          <div className="incoming-stat cancelled-stat">
-            <div className="incoming-stat-icon">×</div>
-            <div>
-              <strong>{counts.CANCELLED}</strong>
-              <span>Cancelled Requests</span>
-            </div>
-          </div>
-
-          <div className="incoming-stat declined-stat">
-            <div className="incoming-stat-icon">×</div>
-            <div>
-              <strong>{counts.REJECTED}</strong>
-              <span>Declined Requests</span>
-            </div>
-          </div>
+        <div className="incoming-stats" aria-label="Filter orders by status">
+          {filters.filter(item => item.key !== 'ALL').map(item => (
+            <button key={item.key} type="button"
+              className={`incoming-stat ${filter === item.key ? 'active' : ''}`}
+              aria-pressed={filter === item.key}
+              disabled={arrangementLoading || confirmingArrangementId !== null || processingId !== null}
+              onClick={() => { setFilter(item.key); setSelectedArrangementOrderId(null); setProposal(null); setArrangementError('') }}>
+              <span>{item.label}</span>
+              <strong>{counts[item.key]}</strong>
+            </button>
+          ))}
         </div>
-
-        {/* Filters and Search */}
-
         <div className="incoming-toolbar">
           <div className="incoming-filters">
-            {filters.map(item => (
-              <button
-                key={item.key}
-                type="button"
-                className={filter === item.key ? 'active' : ''}
-                onClick={() => setFilter(item.key)}
-              >
-                {item.label} ({counts[item.key]})
-              </button>
-            ))}
+            <button type="button" className={filter === 'ALL' ? 'active' : ''}
+              aria-pressed={filter === 'ALL'} disabled={arrangementLoading || confirmingArrangementId !== null || processingId !== null}
+              onClick={() => { setFilter('ALL'); setSearch(''); setSelectedArrangementOrderId(null); setProposal(null); setArrangementError('') }}>
+              All Orders ({counts.ALL})
+            </button>
+            {filter !== 'ALL' && <span>{filters.find(item => item.key === filter)?.label} orders</span>}
           </div>
 
           <input
@@ -523,6 +453,7 @@ export default function IncomingOrders({
           />
         </div>
 
+        {success && <div className="incoming-success" role="status">{success}<button type="button" onClick={() => setSuccess('')} aria-label="Dismiss message">×</button></div>}
         {/* Errors */}
 
         {actionError && (
@@ -669,11 +600,13 @@ export default function IncomingOrders({
      
 onClick={() => {
   if (selectedArrangementOrderId === order.id) {
+    setProposal(null)
     setSelectedArrangementOrderId(null)
     setArrangementError('')
     return
   }
 
+  setProposal(null)
   setSelectedArrangementOrderId(order.id)
   setArrangementError('')
   void loadArrangement(order.id)
@@ -703,93 +636,66 @@ onClick={() => {
                  {selectedArrangementOrderId === order.id && (
       <div className="incoming-arrangement-details">
         <h4>Pickup & Delivery</h4>
+        <ol className="incoming-lifecycle" aria-label="Order progress">
+          {(['SUBMITTED', 'ACCEPTED', 'ARRANGED', 'COMPLETED'] as const).map((step, index, steps) => {
+            const current = steps.indexOf(order.status as typeof step)
+            return <li key={step} className={index < current ? 'done' : index === current ? 'current' : ''} aria-current={index === current ? 'step' : undefined}>
+              <span className="incoming-step-dot">{index < current ? '✓' : index + 1}</span>
+              <span>{step === 'SUBMITTED' ? 'Pending' : step.charAt(0) + step.slice(1).toLowerCase()}</span>
+            </li>
+          })}
+        </ol>
 
-        {arrangementLoading ? (
-          <p>Loading arrangement...</p>
-        ) : arrangementError ? (
-          <p
-            className="incoming-arrangement-error"
-            role="alert"
-          >
-            {arrangementError}
-          </p>
-        ) : arrangements[order.id] ? (
-          <>
-            <p>
-              <strong>Method:</strong>{' '}
-              {arrangements[order.id]?.method === 'PICKUP'
-                ? 'Pickup'
-                : 'Delivery'}
-            </p>
-
-            <p>
-              <strong>Location:</strong>{' '}
-              {arrangements[order.id]?.method === 'PICKUP'
-                ? arrangements[order.id]?.pickup_point
-                : arrangements[order.id]?.delivery_address}
-            </p>
-
-            <p>
-              <strong>Date:</strong>{' '}
-              {new Date(
-                arrangements[order.id]!.preferred_date
-              ).toLocaleDateString('en-GB', {
-                timeZone: 'UTC',
-              })}
-            </p>
-
-            <p>
-              <strong>Time:</strong>{' '}
-              {arrangements[order.id]?.preferred_time
-                ? arrangements[order.id]!.preferred_time!.slice(11, 16)
-                : 'Not specified'}
-            </p>
-
-            <p>
-              <strong>Status:</strong>{' '}
-              <span
-                className={`incoming-fulfilment-status fulfilment-${arrangements[
-                  order.id
-                ]?.status.toLowerCase()}`}
-              >
-                {arrangements[order.id]?.status}
-              </span>
-            </p>
-
-            {order.status === 'ACCEPTED' && arrangements[order.id]?.status === 'PENDING' && (
-              <button
-                type="button"
-                className="incoming-confirm-arrangement"
-                disabled={
-                  confirmingArrangementId !== null ||
-                  arrangementLoading
-                }
-                onClick={() =>
-                  void handleConfirmArrangement(
-                    arrangements[order.id]!.id,
-                    order.id
-                  )
-                }
-              >
-                {confirmingArrangementId ===
-                arrangements[order.id]?.id
-                  ? 'Confirming...'
-                  : '✓ Confirm Arrangement'}
-              </button>
-            )}
-
-            {arrangements[order.id]?.status === 'CONFIRMED' && (
-              <p className="incoming-arrangement-confirmed">
-                ✓ Arrangement confirmed
-              </p>
-            )}
+        {arrangementError && <p className="incoming-arrangement-error" role="alert">{arrangementError}</p>}
+        {arrangementLoading ? <p>Loading arrangement...</p> : arrangements[order.id] ? (() => {
+          const arrangement = arrangements[order.id]!
+          const busy = confirmingArrangementId !== null
+          const hasCounter = Boolean(arrangement.counter_method && arrangement.counter_preferred_date)
+          const finalCounter = arrangement.status === 'CONFIRMED' && hasCounter
+          const details = (counter: boolean) => {
+            const method = counter ? arrangement.counter_method : arrangement.method
+            const date = counter ? arrangement.counter_preferred_date : arrangement.preferred_date
+            const time = counter ? arrangement.counter_preferred_time : arrangement.preferred_time
+            const location = counter ? (method === 'PICKUP' ? arrangement.counter_pickup_point : arrangement.counter_delivery_address) : (method === 'PICKUP' ? arrangement.pickup_point : arrangement.delivery_address)
+            const message = counter ? arrangement.counter_message : arrangement.message
+            return <div className="incoming-proposal-grid">
+              <p><strong>Method</strong>{method === 'PICKUP' ? 'Pickup' : 'Delivery'}</p>
+              <p><strong>Location</strong>{location || 'Not specified'}</p>
+              <p><strong>Date</strong>{date ? new Date(date).toLocaleDateString('en-GB', { timeZone: 'UTC' }) : 'Not specified'}</p>
+              <p><strong>Time</strong>{time ? (time.includes('T') ? time.slice(11, 16) : time.slice(0, 5)) : 'Not specified'}</p>
+              {message && <p className="incoming-proposal-message"><strong>Message</strong>{message}</p>}
+            </div>
+          }
+          return <>
+            <p className="incoming-proposal-wide"><strong>Status</strong><span className={`incoming-fulfilment-status fulfilment-${arrangement.status.toLowerCase()}`}>{arrangement.status === 'COUNTERPROPOSED' ? 'AWAITING RESTAURANT RESPONSE' : arrangement.status}</span></p>
+            <section className="incoming-proposal-wide">
+              <h5>{arrangement.status === 'CONFIRMED' ? 'Agreed arrangement' : 'Restaurant proposal'}</h5>
+              {details(finalCounter)}
+            </section>
+            {hasCounter && !finalCounter && <section className="incoming-proposal-wide incoming-counter-card"><h5>Your alternative proposal</h5>{details(true)}</section>}
+            {arrangement.status === 'DECLINED' && <p className="incoming-proposal-wide">Waiting for the restaurant to submit a revised arrangement.</p>}
+            {arrangement.status === 'COUNTERPROPOSED' && <p className="incoming-proposal-wide">Your proposal has been sent to the restaurant.</p>}
+            {arrangement.status === 'CONFIRMED' && <p className="incoming-proposal-wide">✓ Arrangement confirmed</p>}
+            {order.status === 'ACCEPTED' && arrangement.status === 'PENDING' && <>
+              <div className="incoming-negotiation-actions">
+                <button type="button" className="incoming-action-button incoming-accept" disabled={busy || proposal !== null} onClick={() => void handleArrangementAction(arrangement.id, order.id, 'confirm')}>Confirm Arrangement</button>
+                <button type="button" className="incoming-action-button incoming-arrangement-button" disabled={busy || proposal !== null} onClick={() => { setArrangementError(''); setProposal({ method: arrangement.method, location: (arrangement.method === 'PICKUP' ? arrangement.pickup_point : arrangement.delivery_address) || '', date: arrangement.preferred_date.slice(0, 10), time: arrangement.preferred_time?.slice(11, 16) || '', message: '' }) }}>Suggest Changes</button>
+                <button type="button" className="incoming-action-button incoming-reject" disabled={busy || proposal !== null} onClick={() => void handleArrangementAction(arrangement.id, order.id, 'decline')}>Decline Arrangement</button>
+              </div>
+              {proposal && <form className="incoming-counter-form" onSubmit={event => { event.preventDefault(); void handleArrangementAction(arrangement.id, order.id, 'counterproposal') }}>
+                <h5>Suggest an alternative arrangement</h5>
+                <fieldset disabled={busy}>
+                  <label>Method<select value={proposal.method} onChange={event => setProposal({ ...proposal, method: event.target.value as FulfilmentMethod, location: '' })}><option value="PICKUP">Pickup</option><option value="DELIVERY">Delivery</option></select></label>
+                  <label>{proposal.method === 'PICKUP' ? 'Pickup point' : 'Delivery address'}<input required maxLength={255} value={proposal.location} onChange={event => setProposal({ ...proposal, location: event.target.value })}/></label>
+                  <label>Date<input type="date" required min={new Date().toISOString().slice(0, 10)} value={proposal.date} onChange={event => setProposal({ ...proposal, date: event.target.value })}/></label>
+                  <label>Time (optional)<input type="time" value={proposal.time} onChange={event => setProposal({ ...proposal, time: event.target.value })}/></label>
+                  <label className="incoming-proposal-wide">Message (optional)<textarea maxLength={500} rows={3} value={proposal.message} onChange={event => setProposal({ ...proposal, message: event.target.value })}/></label>
+                </fieldset>
+                <div className="incoming-negotiation-actions"><button type="submit" className="incoming-action-button incoming-accept" disabled={busy}>{busy ? 'Sending...' : 'Send Proposal'}</button><button type="button" className="incoming-action-button incoming-reject" disabled={busy} onClick={() => setProposal(null)}>Cancel</button></div>
+              </form>}
+            </>}
           </>
-        ) : (
-          <p>
-            The restaurant has not submitted a pickup
-            or delivery arrangement yet.
-          </p>
-        )}
+        })() : !arrangementError && <p>The restaurant has not submitted a pickup or delivery arrangement yet.</p>}
 
         <button
           type="button"
@@ -799,7 +705,8 @@ onClick={() => {
             confirmingArrangementId !== null
           }
           onClick={() => {
-            setSelectedArrangementOrderId(null)
+            setProposal(null)
+    setSelectedArrangementOrderId(null)
             setArrangementError('')
           }}
         >
