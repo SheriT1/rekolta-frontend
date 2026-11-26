@@ -1,0 +1,286 @@
+
+/* Product Images - Image Management */
+
+.rk-image-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rk-image-manager > h2 {
+  margin-bottom: 0;
+}
+
+.rk-image-manager > p {
+  margin: 0;
+  color: #587363;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Attached files heading */
+
+.rk-image-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  padding-bottom: 2px;
+}
+
+.rk-image-heading strong {
+  color: #18482f;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.rk-image-heading span {
+  color: #587363;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+/* Individual attached file */
+
+.rk-image-file {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  background: #e8eedf;
+  border: 1px solid #b6c5ae;
+  border-radius: 10px;
+  transition: background 0.2s ease;
+}
+
+.rk-image-file:hover {
+  background: #e1e9d7;
+}
+
+.rk-image-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  background: #f8faf4;
+  border: 1px solid #c6d3bd;
+  border-radius: 8px;
+  color: #18482f;
+}
+
+.rk-image-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.rk-image-info strong {
+  display: block;
+  overflow: hidden;
+  color: #18482f;
+  font-size: 15px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rk-image-info small {
+  color: #587363;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Remove image button */
+
+.rk-image-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: #18482f;
+  font-family: inherit;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.rk-image-remove:hover:not(:disabled) {
+  background: #fbe9e6;
+  border-color: #e4c3bd;
+  color: #a33b32;
+}
+
+.rk-image-remove:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Visually hidden native file input */
+
+.rk-image-manager .rk-image-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Upload Images button */
+
+.rk-image-manager .rk-image-upload {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
+  gap: 10px;
+  min-height: 46px;
+  padding: 12px 22px;
+  margin-top: 4px;
+  box-sizing: border-box;
+  background: #18482f;
+  border: 1px solid #18482f;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.rk-image-manager .rk-image-upload:hover {
+  background: #245e40;
+  border-color: #245e40;
+}
+
+.rk-image-upload svg {
+  flex-shrink: 0;
+}
+
+.rk-image-manager .rk-image-upload.rk-image-disabled {
+  background: #dce4d5;
+  border-color: #c6d3bd;
+  color: #71816b;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Undo removal */
+
+.rk-image-undo {
+  padding: 0;
+  background: transparent;
+  border: none;
+  color: #18482f;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.rk-image-undo:hover:not(:disabled) {
+  color: #34754b;
+}
+
+.rk-image-undo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Keyboard accessibility */
+
+.rk-image-remove:focus-visible,
+.rk-image-undo:focus-visible,
+.rk-image-input:focus-visible + .rk-image-upload {
+  outline: 2px solid #34754b;
+  outline-offset: 3px;
+}
+
+/* Responsive layout */
+
+@media (max-width: 600px) {
+  .rk-image-manager {
+    gap: 12px;
+  }
+
+  .rk-image-file {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .rk-image-symbol {
+    width: 36px;
+    height: 36px;
+  }
+
+  .rk-image-symbol svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .rk-image-info strong {
+    font-size: 14px;
+  }
+
+  .rk-image-info small {
+    font-size: 12px;
+  }
+
+  .rk-image-remove {
+    width: 36px;
+    height: 36px;
+  }
+
+  .rk-image-manager .rk-image-upload {
+    align-self: stretch;
+    width: 100%;
+  }
+
+  .rk-image-manager > p {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .rk-image-file {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  .rk-image-heading strong {
+    font-size: 14px;
+  }
+
+  .rk-image-heading span {
+    font-size: 12px;
+  }
+}
