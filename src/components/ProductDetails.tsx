@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from 'react'
+import { useFavorites, FavoriteButton } from './Favorites'
 
 const API_URL = `http://${window.location.hostname}:3000`
 
@@ -46,6 +47,7 @@ function ProductDetails({
   onBack,
   isRestaurant,
 }: ProductDetailsProps) {
+  const favorites = useFavorites(isRestaurant)
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -230,6 +232,14 @@ async function handleSubmitRequest() {
                   aria-label="Product photo gallery"
                 >
                   <div className="rk-detail-main-photo">
+                    {isRestaurant && (
+                      <div className="rk-detail-favorite">
+                        <FavoriteButton
+                          productId={product.id}
+                          favorites={favorites}
+                        />
+                      </div>
+                    )}
                     {activeImage ? (
                       <img
                         src={getImageUrl(activeImage.image_url)}
@@ -293,6 +303,11 @@ async function handleSubmitRequest() {
                         </button>
                       ))}
                     </div>
+                  )}
+                  {isRestaurant && favorites.error && (
+                    <p role="alert" className="rk-detail-message">
+                      {favorites.error}
+                    </p>
                   )}
                 </section>
 

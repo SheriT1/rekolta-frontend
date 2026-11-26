@@ -1,0 +1,98 @@
+/* Favorites button */
+
+.rk-favorite-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 10px 14px;
+  border: 1px solid #d4e1cf;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #24452b;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+/* Heart icon */
+
+.rk-favorite-button[aria-pressed] {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.rk-favorite-button svg {
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Hover state */
+
+.rk-favorite-button:hover:not(:disabled) {
+  background: #f0f6eb;
+  border-color: #8eb781;
+  color: #18482f;
+}
+
+/* Saved product */
+
+.rk-favorite-button--active {
+  background: #fff1f1;
+  border-color: #edc5c5;
+  color: #b83c3c;
+}
+
+.rk-favorite-button--active:hover:not(:disabled) {
+  background: #fce4e4;
+  border-color: #d99a9a;
+  color: #a12b2b;
+}
+
+/* Keyboard accessibility */
+
+.rk-favorite-button:focus-visible {
+  outline: 2px solid #258c3e;
+  outline-offset: 3px;
+}
+
+/* Loading and disabled states */
+
+.rk-favorite-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.rk-favorite-button[aria-busy='true'] {
+  opacity: 0.65;
+  cursor: wait;
+}
+/* Favorites button inside the product gallery */
+
+.rk-detail-main-photo {
+  position: relative;
+}
+
+.rk-detail-favorite {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+}
+
+.rk-detail-favorite .rk-favorite-button {
+  width: 46px;
+  height: 46px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+}
