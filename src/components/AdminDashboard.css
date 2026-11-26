@@ -1,0 +1,49 @@
+.admin-workspace {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  width: 100%;
+  min-height: 600px;
+  text-align: left;
+  color: #24452b;
+  background: #f5f7f1;
+  border: 1px solid #dce5d7;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.admin-sidebar { background: #214b32; color: #fff; padding: 28px 18px; }
+.admin-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; }
+.admin-sidebar nav { display: grid; gap: 8px; margin-top: 28px; }
+.admin-workspace .admin-sidebar button {
+  width: 100%; padding: 13px 16px; border: 0; border-radius: 7px;
+  background: transparent; color: #fff; text-align: left; font: inherit; cursor: pointer;
+}
+.admin-workspace .admin-sidebar button:hover,
+.admin-workspace .admin-sidebar button.admin-active { background: #3b684a; }
+.admin-content { min-width: 0; padding: 28px; }
+.admin-heading { background: #e4ecda; padding: 28px; border-radius: 12px; }
+.admin-workspace .admin-heading h1 { margin: 12px 0; font-size: clamp(26px, 3vw, 38px); color: #214b32; }
+.admin-workspace p { margin: 0; color: #53644e; line-height: 1.6; }
+.admin-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 22px 0; }
+.admin-stats article { background: white; border: 1px solid #dce5d7; border-radius: 10px; padding: 20px; }
+.admin-stats article span { display: block; font-size: 14px; color: #53644e; }
+.admin-stats article strong { display: block; font-size: 32px; margin-top: 12px; }
+.admin-management { background: white; padding: 22px; border: 1px solid #dce5d7; border-radius: 12px; margin-top: 22px; }
+.admin-management h2 { margin: 0 0 14px; font-size: 21px; }
+.admin-workspace .admin-management button {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  width: 100%; padding: 17px 0; border: 0; border-bottom: 1px solid #e5ebe0;
+  background: transparent; color: #24452b; text-align: left; font: inherit; cursor: pointer;
+}
+.admin-workspace .admin-management button:last-child { border-bottom: 0; }
+.admin-workspace .admin-management button:hover { color: #477e43; }
+.admin-management small { display: block; color: #53644e; margin-top: 5px; }
+.admin-workspace button:focus-visible { outline: 2px solid #91b76b; outline-offset: 3px; }
+@media (max-width: 720px) {
+  .admin-workspace { grid-template-columns: 1fr; }
+  .admin-sidebar { padding: 18px; }
+  .admin-sidebar nav { display: flex; flex-wrap: wrap; margin-top: 12px; }
+  .admin-workspace .admin-sidebar button { width: auto; }
+  .admin-content { padding: 16px; }
+  .admin-heading { padding: 20px; }
+}
+@media (max-width: 400px) { .admin-stats { grid-template-columns: 1fr; } }

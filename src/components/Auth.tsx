@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { SubmitEventHandler } from 'react'
 import ProducerDashboard from './ProducerDashboard'
 import RestaurantDashboard from './RestaurantDashboard'
+import AdminDashboard from './AdminDashboard'
 
 type AuthMode = 'login' | 'register'
 type UserRole = 'PRODUCER' | 'RESTAURANT' | 'ADMIN'
@@ -182,14 +183,12 @@ export default function Auth({
     <main className="auth-page">
       <section
         className={
-        currentUser?.role === 'PRODUCER' ||
-        currentUser?.role === 'RESTAURANT'
+        currentUser
           ? 'auth-card auth-card--producer'
           : 'auth-card'
         }
       >
-    {currentUser?.role !== 'PRODUCER' &&
-    currentUser?.role !== 'RESTAURANT' && (
+    {!currentUser && (
           <>
             <h1>Rekolta</h1>
             <p>Connecting local producers and restaurants</p>
@@ -212,7 +211,7 @@ export default function Auth({
              onViewAllRequests={onViewAllRequests}
               />
             ) : (
-              <p>Welcome to Rekolta.</p>
+              <AdminDashboard fullName={currentUser.fullName} />
             )}
           </div>
         ) : (
