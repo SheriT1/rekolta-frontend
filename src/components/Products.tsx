@@ -1,6 +1,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useFavorites, FavoriteButton } from './Favorites'
+import ReportListing from './ReportListing'
 import './Products.css'
 
 const API_URL = `http://${window.location.hostname}:3000`
@@ -619,28 +620,31 @@ export default function Products({
                               {product.unit} available
                             </span>
                           </div>
-
                           <div className="rk-market-card-footer">
                             <div className="rk-market-price">
                               <strong>
                                 €{Number(product.price).toFixed(2)}
                               </strong>
 
-                              <span>
-                                per {product.unit}
-                              </span>
+                              <span>per {product.unit}</span>
                             </div>
 
-                            <button
-                              type="button"
-                              className="rk-market-details-button"
-                              onClick={() =>
-                                onViewDetails(product.id)
-                              }
-                            >
-                              View Details
-                              <ArrowIcon />
-                            </button>
+                            <div className="rk-market-card-actions">
+                              <ReportListing
+                                productId={product.id}
+                                productName={product.name}
+                                isRestaurant={isRestaurant}
+                              />
+
+                              <button
+                                type="button"
+                                className="rk-market-details-button"
+                                onClick={() => onViewDetails(product.id)}
+                              >
+                                View Details
+                                <ArrowIcon />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </article>
