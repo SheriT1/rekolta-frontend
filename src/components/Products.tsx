@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useFavorites, FavoriteButton } from './Favorites'
 import ReportListing from './ReportListing'
+import Recommendations from './Recommendations'
 import './Products.css'
 
 const API_URL = `http://${window.location.hostname}:3000`
@@ -22,6 +23,7 @@ type Product = {
   quality: string | null
   available_quantity: string | number
   categories?: {
+    id: string
     name: string
   } | null
   producer_profiles?: {
@@ -112,6 +114,13 @@ export default function Products({
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  const [activeView, setActiveView] = useState<
+    'browse' | 'recommendations'
+  >('browse')
+
+  const showRecommendations =
+    isRestaurant && activeView === 'recommendations'
 
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
@@ -288,373 +297,442 @@ export default function Products({
               Rekolta Marketplace
             </span>
 
-           <h1>Explore the Harvest.</h1>
+            <h1>Explore the Harvest.</h1>
 
-          <p>
-            Discover local farms and their agricultural products.
-          </p>
+            <p>
+              Discover local farms and their agricultural products.
+            </p>
 
-            <div className="rk-market-search">
-              <SearchIcon />
-
-              <input
-                type="search"
-                aria-label="Search products or farms"
-                placeholder="Search products or farms..."
-                value={search}
-                onChange={(event) =>
-                  setSearch(event.target.value)
-                }
-              />
-            </div>
-          </div>
-        </header>
-
-        {/* Marketplace filters */}
-
-        <section
-          className="rk-market-filters"
-          aria-label="Product filters"
-        >
-          <div className="rk-market-filter-header">
-            <h2>Filter Products</h2>
-
-            <button
-              type="button"
-              className="rk-market-reset"
-              onClick={resetFilters}
-            >
-              Reset filters
-            </button>
-          </div>
-
-          <div className="rk-market-filter-grid">
-
-            <div className="rk-market-field">
-              <label htmlFor="market-category">
-                Category
-              </label>
-
-              <select
-                id="market-category"
-                value={category}
-                onChange={(event) =>
-                  setCategory(event.target.value)
-                }
-              >
-                <option value="">All categories</option>
-
-                {categories.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="rk-market-field">
-              <label htmlFor="market-quality">
-                Quality
-              </label>
-
-              <select
-                id="market-quality"
-                value={quality}
-                onChange={(event) =>
-                  setQuality(event.target.value)
-                }
-              >
-                <option value="">All qualities</option>
-
-                {QUALITY_OPTIONS.map((item) => (
-                  <option key={item} value={item}>
-                    {item.charAt(0) +
-                      item.slice(1).toLowerCase()}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="rk-market-field">
-              <label htmlFor="market-min-price">
-                Price range (€)
-              </label>
-
-              <div className="rk-market-price-range">
-                <input
-                  id="market-min-price"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Min"
-                  aria-label="Minimum price"
-                  aria-invalid={invalidPriceRange}
-                  value={minPrice}
-                  onChange={(event) =>
-                    setMinPrice(event.target.value)
-                  }
-                />
-
-                <span aria-hidden="true">-</span>
+            {!showRecommendations && (
+              <div className="rk-market-search">
+                <SearchIcon />
 
                 <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Max"
-                  aria-label="Maximum price"
-                  aria-invalid={invalidPriceRange}
-                  value={maxPrice}
+                  type="search"
+                  aria-label="Search products or farms"
+                  placeholder="Search products or farms..."
+                  value={search}
                   onChange={(event) =>
-                    setMaxPrice(event.target.value)
+                    setSearch(event.target.value)
                   }
                 />
               </div>
-            </div>
-
-            <div className="rk-market-field">
-              <label htmlFor="market-location">
-                Producer location
-              </label>
-
-              <select
-                id="market-location"
-                value={location}
-                onChange={(event) =>
-                  setLocation(event.target.value)
-                }
-              >
-                <option value="">All locations</option>
-
-                {locations.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </div>
+            )}
           </div>
+        </header>
 
-          {invalidPriceRange && (
-            <p className="rk-market-error" role="alert">
-              Enter a valid price range. Prices must be
-              non-negative and the minimum must not
-              exceed the maximum.
-            </p>
-          )}
-        </section>
+        {/* Restaurant marketplace navigation */}
 
-        {/* Product collection */}
+        {isRestaurant && (
+          <nav
+            className="rk-market-tabs"
+            aria-label="Marketplace views"
+          >
+            <button
+              type="button"
+              className="rk-market-tab"
+              aria-pressed={!showRecommendations}
+              onClick={() => setActiveView('browse')}
+            >
+              Browse Products
+            </button>
 
-        <section
-          className="rk-market-collection"
-          aria-label="Available products"
-        >
-          <div className="rk-market-results-header">
-            <div>
-              <span className="rk-market-collection-label">
-                Harvest Collection
-              </span>
+            <button
+              type="button"
+              className="rk-market-tab"
+              aria-pressed={showRecommendations}
+              onClick={() =>
+                setActiveView('recommendations')
+              }
+            >
+              Recommendations
+            </button>
+          </nav>
+        )}
 
-              <h2>Available Products</h2>
+        {showRecommendations ? (
+          <>
+            {loading ? (
+              <div
+                className="rk-market-collection"
+                role="status"
+              >
+                <div className="rk-market-message">
+                  Loading products...
+                </div>
+              </div>
+            ) : error ? (
+              <div
+                className="rk-market-error"
+                role="alert"
+              >
+                {error}
+              </div>
+            ) : (
+              <Recommendations
+                products={products}
+                onViewDetails={onViewDetails}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            {/* Marketplace filters */}
 
-              {!loading && !error && !invalidPriceRange && (
-                <p role="status">
-                  {visibleProducts.length}{' '}
-                  {visibleProducts.length === 1
-                    ? 'product'
-                    : 'products'}{' '}
-                  found
+            <section
+              className="rk-market-filters"
+              aria-label="Product filters"
+            >
+              <div className="rk-market-filter-header">
+                <h2>Filter Products</h2>
+
+                <button
+                  type="button"
+                  className="rk-market-reset"
+                  onClick={resetFilters}
+                >
+                  Reset filters
+                </button>
+              </div>
+
+              <div className="rk-market-filter-grid">
+
+                <div className="rk-market-field">
+                  <label htmlFor="market-category">
+                    Category
+                  </label>
+
+                  <select
+                    id="market-category"
+                    value={category}
+                    onChange={(event) =>
+                      setCategory(event.target.value)
+                    }
+                  >
+                    <option value="">All categories</option>
+
+                    {categories.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="rk-market-field">
+                  <label htmlFor="market-quality">
+                    Quality
+                  </label>
+
+                  <select
+                    id="market-quality"
+                    value={quality}
+                    onChange={(event) =>
+                      setQuality(event.target.value)
+                    }
+                  >
+                    <option value="">All qualities</option>
+
+                    {QUALITY_OPTIONS.map((item) => (
+                      <option key={item} value={item}>
+                        {item.charAt(0) +
+                          item.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="rk-market-field">
+                  <label htmlFor="market-min-price">
+                    Price range (€)
+                  </label>
+
+                  <div className="rk-market-price-range">
+                    <input
+                      id="market-min-price"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="Min"
+                      aria-label="Minimum price"
+                      aria-invalid={invalidPriceRange}
+                      value={minPrice}
+                      onChange={(event) =>
+                        setMinPrice(event.target.value)
+                      }
+                    />
+
+                    <span aria-hidden="true">-</span>
+
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      placeholder="Max"
+                      aria-label="Maximum price"
+                      aria-invalid={invalidPriceRange}
+                      value={maxPrice}
+                      onChange={(event) =>
+                        setMaxPrice(event.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+
+                <div className="rk-market-field">
+                  <label htmlFor="market-location">
+                    Producer location
+                  </label>
+
+                  <select
+                    id="market-location"
+                    value={location}
+                    onChange={(event) =>
+                      setLocation(event.target.value)
+                    }
+                  >
+                    <option value="">All locations</option>
+
+                    {locations.map((item) => (
+                      <option key={item} value={item}>
+                        {item}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {invalidPriceRange && (
+                <p className="rk-market-error" role="alert">
+                  Enter a valid price range. Prices must be
+                  non-negative and the minimum must not
+                  exceed the maximum.
                 </p>
               )}
-            </div>
-          </div>
+            </section>
 
-          {loading && (
-            <div className="rk-market-message" role="status">
-              Loading products...
-            </div>
-          )}
+            {/* Product collection */}
 
-          {error && (
-            <div className="rk-market-error" role="alert">
-              {error}
-            </div>
-          )}
+            <section
+              className="rk-market-collection"
+              aria-label="Available products"
+            >
+              <div className="rk-market-results-header">
+                <div>
+                  <span className="rk-market-collection-label">
+                    Harvest Collection
+                  </span>
 
-          {isRestaurant && favorites.error && (
-            <p className="rk-market-error" role="alert">
-              {favorites.error}
-            </p>
-          )}
+                  <h2>Available Products</h2>
 
-          {!loading && !error && !invalidPriceRange && (
-            <>
-              {visibleProducts.length === 0 ? (
-                <div className="rk-market-message">
-                  <h3>No products found</h3>
-
-                  <p>
-                    Try changing your search or filters.
-                  </p>
-
-                  <button
-                    type="button"
-                    className="rk-market-details-button"
-                    onClick={resetFilters}
-                  >
-                    Reset filters
-                  </button>
+                  {!loading && !error && !invalidPriceRange && (
+                    <p role="status">
+                      {visibleProducts.length}{' '}
+                      {visibleProducts.length === 1
+                        ? 'product'
+                        : 'products'}{' '}
+                      found
+                    </p>
+                  )}
                 </div>
-              ) : (
-                <div className="rk-market-grid">
-                  {visibleProducts.map((product) => {
-                    const photos = [
-                      ...(product.product_images ?? []),
-                    ].sort(
-                      (a, b) =>
-                        Number(b.is_cover) -
-                          Number(a.is_cover) ||
-                        a.sort_order - b.sort_order
-                    )
+              </div>
 
-                    return (
-                      <article
-                        key={product.id}
-                        className="rk-market-card"
-                      >
-                        {/* Product image section */}
-
-                        <div className="rk-market-card-top">
-                          <div className="rk-market-card-heading">
-                            <span className="rk-market-category">
-                              {product.categories?.name ??
-                                'Local produce'}
-                            </span>
-
-                            {isRestaurant && (
-                              <FavoriteButton
-                                productId={product.id}
-                                favorites={favorites}
-                              />
-                            )}
-                          </div>
-
-                          <div className="rk-market-photo">
-                            {photos[0] ? (
-                              <img
-                                src={imageUrl(
-                                  photos[0].image_url
-                                )}
-                                alt={product.name}
-                                loading="lazy"
-                              />
-                            ) : (
-                              <div className="rk-market-no-photo">
-                                <span aria-hidden="true">
-                                  🌱
-                                </span>
-
-                                <p>No image available</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Curved transition */}
-
-                        <svg
-                          className="rk-market-wave"
-                          viewBox="0 0 300 22"
-                          preserveAspectRatio="none"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M0 0 H300 V5 Q225 29 150 13 Q75 -1 0 17 Z"
-                            fill="#DFE9D5"
-                          />
-
-                          <path
-                            d="M0 17 Q75 -1 150 13 Q225 29 300 5"
-                            fill="none"
-                            stroke="#A8BDA0"
-                            strokeWidth="0.8"
-                          />
-                        </svg>
-
-                        {/* Product information */}
-
-                        <div className="rk-market-card-body">
-                          <span className="rk-market-quality">
-                            {product.quality
-                              ? `${product.quality} QUALITY`
-                              : 'QUALITY NOT SPECIFIED'}
-                          </span>
-
-                          <h3>{product.name}</h3>
-
-                          <p className="rk-market-producer">
-                            {product.producer_profiles
-                              ?.business_name ?? 'Local farm'}
-                          </p>
-
-                          <div className="rk-market-location">
-                            <LocationIcon />
-
-                            <span>
-                              {product.producer_profiles
-                                ?.city ?? 'Location not specified'}
-                            </span>
-                          </div>
-
-                          <div className="rk-market-availability">
-                            <span
-                              className="rk-market-stock-dot"
-                              aria-hidden="true"
-                            />
-
-                            <span>
-                              {Number(
-                                product.available_quantity
-                              )}{' '}
-                              {product.unit} available
-                            </span>
-                          </div>
-                          <div className="rk-market-card-footer">
-                            <div className="rk-market-price">
-                              <strong>
-                                €{Number(product.price).toFixed(2)}
-                              </strong>
-
-                              <span>per {product.unit}</span>
-                            </div>
-
-                            <div className="rk-market-card-actions">
-                              <ReportListing
-                                productId={product.id}
-                                productName={product.name}
-                                isRestaurant={isRestaurant}
-                              />
-
-                              <button
-                                type="button"
-                                className="rk-market-details-button"
-                                onClick={() => onViewDetails(product.id)}
-                              >
-                                View Details
-                                <ArrowIcon />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </article>
-                    )
-                  })}
+              {loading && (
+                <div
+                  className="rk-market-message"
+                  role="status"
+                >
+                  Loading products...
                 </div>
               )}
-            </>
-          )}
-        </section>
+
+              {error && (
+                <div
+                  className="rk-market-error"
+                  role="alert"
+                >
+                  {error}
+                </div>
+              )}
+
+              {isRestaurant && favorites.error && (
+                <p className="rk-market-error" role="alert">
+                  {favorites.error}
+                </p>
+              )}
+
+              {!loading && !error && !invalidPriceRange && (
+                <>
+                  {visibleProducts.length === 0 ? (
+                    <div className="rk-market-message">
+                      <h3>No products found</h3>
+
+                      <p>
+                        Try changing your search or filters.
+                      </p>
+
+                      <button
+                        type="button"
+                        className="rk-market-details-button"
+                        onClick={resetFilters}
+                      >
+                        Reset filters
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="rk-market-grid">
+                      {visibleProducts.map((product) => {
+                        const photos = [
+                          ...(product.product_images ?? []),
+                        ].sort(
+                          (a, b) =>
+                            Number(b.is_cover) -
+                              Number(a.is_cover) ||
+                            a.sort_order - b.sort_order
+                        )
+
+                        return (
+                          <article
+                            key={product.id}
+                            className="rk-market-card"
+                          >
+                            {/* Product image section */}
+
+                            <div className="rk-market-card-top">
+                              <div className="rk-market-card-heading">
+                                <span className="rk-market-category">
+                                  {product.categories?.name ??
+                                    'Local produce'}
+                                </span>
+
+                                {isRestaurant && (
+                                  <FavoriteButton
+                                    productId={product.id}
+                                    favorites={favorites}
+                                  />
+                                )}
+                              </div>
+
+                              <div className="rk-market-photo">
+                                {photos[0] ? (
+                                  <img
+                                    src={imageUrl(
+                                      photos[0].image_url
+                                    )}
+                                    alt={product.name}
+                                    loading="lazy"
+                                  />
+                                ) : (
+                                  <div className="rk-market-no-photo">
+                                    <span aria-hidden="true">
+                                      🌱
+                                    </span>
+
+                                    <p>No image available</p>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Curved transition */}
+
+                            <svg
+                              className="rk-market-wave"
+                              viewBox="0 0 300 22"
+                              preserveAspectRatio="none"
+                              aria-hidden="true"
+                            >
+                              <path
+                                d="M0 0 H300 V5 Q225 29 150 13 Q75 -1 0 17 Z"
+                                fill="#DFE9D5"
+                              />
+
+                              <path
+                                d="M0 17 Q75 -1 150 13 Q225 29 300 5"
+                                fill="none"
+                                stroke="#A8BDA0"
+                                strokeWidth="0.8"
+                              />
+                            </svg>
+
+                            {/* Product information */}
+
+                            <div className="rk-market-card-body">
+                              <span className="rk-market-quality">
+                                {product.quality
+                                  ? `${product.quality} QUALITY`
+                                  : 'QUALITY NOT SPECIFIED'}
+                              </span>
+
+                              <h3>{product.name}</h3>
+
+                              <p className="rk-market-producer">
+                                {product.producer_profiles
+                                  ?.business_name ?? 'Local farm'}
+                              </p>
+
+                              <div className="rk-market-location">
+                                <LocationIcon />
+
+                                <span>
+                                  {product.producer_profiles
+                                    ?.city ?? 'Location not specified'}
+                                </span>
+                              </div>
+
+                              <div className="rk-market-availability">
+                                <span
+                                  className="rk-market-stock-dot"
+                                  aria-hidden="true"
+                                />
+
+                                <span>
+                                  {Number(
+                                    product.available_quantity
+                                  )}{' '}
+                                  {product.unit} available
+                                </span>
+                              </div>
+
+                              <div className="rk-market-card-footer">
+                                <div className="rk-market-price">
+                                  <strong>
+                                    €{Number(product.price).toFixed(2)}
+                                  </strong>
+
+                                  <span>per {product.unit}</span>
+                                </div>
+
+                                <div className="rk-market-card-actions">
+                                  <ReportListing
+                                    productId={product.id}
+                                    productName={product.name}
+                                    isRestaurant={isRestaurant}
+                                  />
+
+                                  <button
+                                    type="button"
+                                    className="rk-market-details-button"
+                                    onClick={() =>
+                                      onViewDetails(product.id)
+                                    }
+                                  >
+                                    View Details
+                                    <ArrowIcon />
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </article>
+                        )
+                      })}
+                    </div>
+                  )}
+                </>
+              )}
+            </section>
+          </>
+        )}
       </div>
     </main>
   )

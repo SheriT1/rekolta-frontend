@@ -1,0 +1,368 @@
+
+/* Marketplace navigation */
+
+.rk-market-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #c9d6bf;
+}
+
+.rk-market-tab {
+  padding: 10px 20px;
+  border: 1px solid var(--market-border);
+  border-radius: 6px;
+  background: var(--market-white);
+  color: var(--market-forest);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rk-market-tab:hover {
+  background: var(--market-sage);
+}
+
+.rk-market-tab[aria-pressed='true'] {
+  border-color: var(--market-forest);
+  background: var(--market-forest);
+  color: #ffffff;
+}
+
+/* Recommendation form */
+
+.rk-recommendation-form {
+  padding: 18px;
+}
+
+.rk-recommendation-description {
+  margin: 0 0 18px;
+  color: var(--market-muted);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.rk-recommendation-form fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.rk-recommendation-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.rk-recommendation-form-actions button {
+  min-height: 42px;
+  padding: 10px 22px;
+}
+
+.rk-recommendation-form button:disabled,
+.rk-recommendation-form select:disabled,
+.rk-recommendation-form input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.rk-recommendations > .rk-market-message {
+  margin-top: 18px;
+}
+
+/* Recommendation criteria */
+
+.rk-recommendation-explanation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 24px;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  border: 1px solid #c9d6bf;
+  border-radius: 6px;
+  background: #e8eedf;
+  color: var(--market-forest);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Ranked results */
+
+.rk-recommendation-results {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rk-recommendation-card {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr) 220px;
+  align-items: stretch;
+  gap: 22px;
+  padding: 16px;
+  border: 1px solid var(--market-border);
+  border-radius: 10px;
+  background: var(--market-white);
+}
+
+.rk-recommendation-card:first-child {
+  border-color: var(--market-green);
+}
+
+/* Product photograph */
+
+.rk-recommendation-photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  overflow: hidden;
+  border-radius: 7px;
+  background: var(--market-sage);
+}
+
+.rk-recommendation-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 240px;
+  object-fit: cover;
+}
+
+/* Product information */
+
+.rk-recommendation-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.rk-recommendation-rank {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  background: var(--market-sage);
+  color: var(--market-forest);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rk-recommendation-card:first-child
+.rk-recommendation-rank {
+  background: var(--market-forest);
+  color: #ffffff;
+}
+
+.rk-recommendation-info h3 {
+  margin: 0 0 8px;
+  color: var(--market-forest);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 27px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.rk-recommendation-location {
+  margin: 0 0 16px;
+  color: var(--market-muted);
+  font-size: 15px;
+}
+
+.rk-recommendation-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid #c9d6bf;
+}
+
+.rk-recommendation-facts > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.rk-recommendation-facts span {
+  color: var(--market-muted);
+  font-size: 14px;
+}
+
+.rk-recommendation-facts strong {
+  color: var(--market-forest);
+  font-size: 16px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* Score, price and action */
+
+.rk-recommendation-offer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 0;
+  padding-left: 20px;
+  border-left: 1px solid #c9d6bf;
+}
+
+.rk-recommendation-score {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rk-recommendation-score > span {
+  color: var(--market-muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rk-recommendation-score strong {
+  color: var(--market-green);
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.rk-recommendation-score progress {
+  appearance: none;
+  width: 100%;
+  height: 7px;
+  overflow: hidden;
+  border: none;
+  border-radius: 4px;
+  background: #dfe9d5;
+  accent-color: var(--market-green);
+}
+
+.rk-recommendation-score progress::-webkit-progress-bar {
+  border-radius: 4px;
+  background: #dfe9d5;
+}
+
+.rk-recommendation-score progress::-webkit-progress-value {
+  border-radius: 4px;
+  background: var(--market-green);
+}
+
+.rk-recommendation-score progress::-moz-progress-bar {
+  border-radius: 4px;
+  background: var(--market-green);
+}
+
+.rk-recommendation-offer .rk-market-price strong {
+  font-size: 28px;
+}
+
+.rk-recommendation-offer .rk-market-details-button {
+  width: 100%;
+}
+
+.rk-recommendation-note {
+  margin: 16px 0 0;
+  color: var(--market-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Responsive layout */
+
+@media (max-width: 1000px) {
+  .rk-recommendation-card {
+    grid-template-columns: 170px minmax(0, 1fr) 180px;
+    gap: 16px;
+  }
+
+  .rk-recommendation-offer {
+    padding-left: 16px;
+  }
+
+  .rk-recommendation-facts {
+    gap: 8px;
+  }
+
+  .rk-recommendation-info h3 {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 760px) {
+  .rk-recommendation-card {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+
+  .rk-recommendation-offer {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: center;
+    padding: 14px 0 0;
+    border-top: 1px solid #c9d6bf;
+    border-left: none;
+  }
+
+  .rk-recommendation-photo {
+    min-height: 160px;
+  }
+}
+
+@media (max-width: 480px) {
+  .rk-market-tabs {
+    gap: 8px;
+  }
+
+  .rk-market-tab {
+    flex: 1;
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .rk-recommendation-form {
+    padding: 14px;
+  }
+
+  .rk-recommendation-form-actions button {
+    width: 100%;
+  }
+
+  .rk-recommendation-card {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    padding: 12px;
+  }
+
+  .rk-recommendation-photo {
+    aspect-ratio: 16 / 9;
+    min-height: 0;
+  }
+
+  .rk-recommendation-photo img {
+    max-height: none;
+  }
+
+  .rk-recommendation-offer {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rk-recommendation-offer .rk-market-details-button {
+    grid-column: 1 / -1;
+  }
+
+  .rk-recommendation-explanation {
+    gap: 8px 16px;
+    font-size: 14px;
+  }
+
+  .rk-recommendation-info h3 {
+    font-size: 25px;
+  }
+}
