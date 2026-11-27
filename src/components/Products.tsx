@@ -293,10 +293,6 @@ export default function Products({
             Discover local farms and their agricultural products.
           </p>
 
-            <p>
-              Discover fresh produce from local Bulgarian farms.
-            </p>
-
             <div className="rk-market-search">
               <SearchIcon />
 
