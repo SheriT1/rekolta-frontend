@@ -184,10 +184,12 @@ export default function Auth({
     <main className="auth-page">
       <section
         className={
-          currentUser
-            ? 'auth-card auth-card--producer'
-            : 'auth-card'
-        }
+        currentUser?.role === 'ADMIN'
+        ? 'auth-card auth-card--admin'
+        : currentUser
+        ? 'auth-card auth-card--producer'
+        : 'auth-card'
+}
       >
         {!currentUser && (
           <>
