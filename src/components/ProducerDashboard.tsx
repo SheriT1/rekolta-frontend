@@ -3,6 +3,7 @@ type ProducerDashboardProps = {
   fullName: string
   onManageProducts: () => void
   onViewOrders: () => void
+  onEditProfile: () => void
 }
 
 const dashboardSections = [
@@ -36,6 +37,7 @@ export default function ProducerDashboard({
   fullName,
   onManageProducts,
   onViewOrders,
+  onEditProfile,
 }: ProducerDashboardProps) {
   const firstName = fullName.trim().split(/\s+/)[0] || 'Producer'
 
@@ -49,6 +51,13 @@ export default function ProducerDashboard({
             Manage your products, orders, and inventory — from your farm
             to local restaurants.
           </p>
+          <button
+          type="button"
+          className="dashboard-profile-button"
+          onClick={onEditProfile}
+          >
+  Edit Profile <span aria-hidden="true">→</span>
+</button>
         </div>
         <div
           className="producer-hero-image"

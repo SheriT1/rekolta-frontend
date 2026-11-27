@@ -9,6 +9,7 @@ import MyProducts from './components/MyProducts'
 import MyOrders from './components/MyOrders'
 import IncomingOrders from './components/IncomingOrders'
 import MyFavorites from './components/MyFavorites'
+import EditProfile from './components/EditProfile'
 import './App.css'
 
 type Page =
@@ -21,6 +22,7 @@ type Page =
   | 'my-orders'
   | 'incoming-orders'
   | 'my-favorites'
+  | 'edit-profile'
 
 type AuthUser = {
   id: string
@@ -191,6 +193,12 @@ function App() {
         <Auth
           currentUser={currentUser}
           onLogin={setCurrentUser}
+          onEditProfile={() => {
+           if (currentUser?.role === 'PRODUCER' ||
+          currentUser?.role === 'RESTAURANT') {
+          setPage('edit-profile')
+           }
+          }}
           onManageProducts={handleManageProducts}
           onBrowseProducts={handleBrowseProducts}
           onViewAllRequests={() => {
@@ -206,6 +214,16 @@ function App() {
           }}
         />
       )}
+
+      {/* Profile Management */}
+{page === 'edit-profile' &&
+  (currentUser?.role === 'PRODUCER' ||
+    currentUser?.role === 'RESTAURANT') && (
+    <EditProfile
+      onBack={() => setPage('dashboard')}
+      onSaved={setCurrentUser}
+    />
+  )}
 
       {/* Producer: My Products */}
       {page === 'my-products' &&

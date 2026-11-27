@@ -16,6 +16,7 @@ type RestaurantDashboardProps = {
   onBrowseProducts: () => void
   onViewAllRequests?: () => void
   onViewFavorites?: () => void
+  onEditProfile: () => void
 }
 
 function getStatusLabel(status: string) {
@@ -96,6 +97,7 @@ export default function RestaurantDashboard({
   onBrowseProducts,
   onViewAllRequests,
   onViewFavorites,
+   onEditProfile,
 }: RestaurantDashboardProps) {
   const firstName = fullName.trim().split(/\s+/)[0] || 'Restaurant Owner'
   const [purchaseRequests, setPurchaseRequests] = useState<RestaurantRequest[]>([])
@@ -221,6 +223,13 @@ async function handleCancel(id: string) {
             Discover fresh local ingredients, manage your orders,
             and connect with Bulgarian agricultural producers.
           </p>
+          <button
+            type="button"
+            className="dashboard-profile-button"
+         onClick={onEditProfile}
+            >
+         Edit Profile <span aria-hidden="true">→</span>
+        </button>
         </div>
 
         <div

@@ -435,6 +435,22 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+.dashboard-profile-button {
+  margin-top: 20px;
+  padding: 12px 22px;
+  border: 1px solid #18482f;
+  border-radius: 8px;
+  background: #fffefa;
+  color: #18482f;
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dashboard-profile-button:hover {
+  background: #dfe9d5;
+}
+
 .producer-dashboard-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 16px 36px rgba(36, 69, 43, 0.12);

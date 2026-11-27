@@ -24,6 +24,7 @@ type AuthProps = {
   onViewAllRequests: () => void
   onViewIncomingOrders: () => void
   onViewFavorites: () => void
+  onEditProfile: () => void
 }
 
 export default function Auth({
@@ -34,6 +35,7 @@ export default function Auth({
   onViewAllRequests,
   onViewIncomingOrders,
   onViewFavorites,
+  onEditProfile,
 }: AuthProps) {
   const [mode, setMode] = useState<AuthMode>('login')
   const [role, setRole] = useState<UserRole>('PRODUCER')
@@ -201,6 +203,7 @@ export default function Auth({
                 fullName={currentUser.fullName}
                 onManageProducts={onManageProducts}
                 onViewOrders={onViewIncomingOrders}
+                onEditProfile={onEditProfile}
               />
             ) : currentUser.role === 'RESTAURANT' ? (
               <RestaurantDashboard
@@ -208,6 +211,7 @@ export default function Auth({
                 onBrowseProducts={onBrowseProducts}
                 onViewAllRequests={onViewAllRequests}
                 onViewFavorites={onViewFavorites}
+                 onEditProfile={onEditProfile}
               />
             ) : (
               <AdminDashboard fullName={currentUser.fullName} />
