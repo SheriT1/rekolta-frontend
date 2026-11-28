@@ -1,4 +1,6 @@
 
+import './DashboardShared.css'
+import './RestaurantDashboard.css'
 import { useEffect, useState } from 'react'
 
 export type RestaurantRequest = {

@@ -71,27 +71,24 @@
   background-color: #dcefd5;
 }
 
-/* Selected authentication tab */
 .auth-tabs button.active {
   background-color: var(--green-primary);
   color: white;
 }
 
-/* Arrange form fields vertically */
+/* Authentication form */
 .auth-card form {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-/* Form labels */
 .auth-card label {
   font-size: 14px;
   font-weight: 600;
   color: var(--green-dark);
 }
 
-/* Input fields and dropdown */
 .auth-card input,
 .auth-card select {
   width: 100%;
@@ -108,7 +105,6 @@
   color: #98a99b;
 }
 
-/* Focused form fields */
 .auth-card input:focus,
 .auth-card select:focus {
   outline: none;
@@ -116,14 +112,12 @@
   box-shadow: 0 0 0 3px rgba(85, 183, 71, 0.16);
 }
 
-/* Validation error */
 .auth-card .auth-error {
   color: #c0392b;
   font-size: 13px;
   margin: 0 0 8px;
 }
 
-/* Main form button */
 .auth-card .auth-submit {
   background-color: var(--green-primary);
   color: white;
@@ -141,7 +135,6 @@
   background-color: #1c7332;
 }
 
-/* Responsive design */
 @media (max-width: 480px) {
   .auth-page {
     padding: 20px 12px;
@@ -207,7 +200,6 @@
   background-color: #285d32;
 }
 
-
 /* Rekolta navigation bar */
 
 .navbar {
@@ -258,8 +250,7 @@
   color: #ffffff;
 }
 
-/* Responsive Navigation 
-*/
+/* Responsive navigation */
 
 @media (max-width: 600px) {
   .navbar {
@@ -282,6 +273,7 @@
     font-size: 14px;
   }
 }
+
 .hero-images {
   display: flex;
   justify-content: center;
@@ -308,411 +300,6 @@
   .hero-images img {
     width: min(100%, 250px);
     height: 240px;
-  }
-}
-
-/* =========================================================
-   REKOLTA PRODUCER DASHBOARD
-   Consolidated styles — photographic cards with a thin
-   sage-green line between the image and white content.
-   ========================================================= */
-
-.producer-dashboard {
-  width: 100%;
-  color: var(--green-dark);
-}
-
-/* Welcome banner */
-.producer-hero {
-  position: relative;
-  isolation: isolate;
-  display: flex;
-  align-items: center;
-  min-height: 220px;
-  padding: 28px 40px;
-  overflow: hidden;
-  border-radius: 22px;
-  background: #194d34;
-}
-
-.producer-hero-image {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background: url('/images/greenfield.jpg') center / cover no-repeat;
-}
-
-
-.producer-hero::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-
-  
-background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 250' preserveAspectRatio='none'%3E%3Cpath d='M0 0 H350 C450 0 440 85 490 150 S550 235 600 250 H0 Z' fill='%23174a2d'/%3E%3C/svg%3E");
-
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-}
-
-
-
-.producer-hero-content {
-  position: relative;
-  max-width: 430px;
-  z-index: 3;
-}
-
-.producer-eyebrow {
-  display: inline-block;
-  margin-bottom: 18px;
-  color: #c9e8b5;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 2px;
-}
-
-.producer-hero h1 {
-  margin: 0 0 10px;
-  color: #fff;
-  font-size: clamp(28px, 3vw, 38px);
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -1px;
-}
-
-.producer-hero p {
-  max-width: 400px;
-  margin: 0;
-  color: #e5f2e3;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* Section heading */
-.producer-section-intro {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  margin: 28px 0 22px;
-}
-
-.producer-section-intro h2 {
-  margin: 0 0 8px;
-  color: #173e26;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(29px, 3vw, 38px);
-  font-weight: 700;
-  letter-spacing: -0.8px;
-}
-
-.producer-section-intro p {
-  margin: 0;
-  color: #4b6552;
-  font-size: 16px;
-}
-
-/* Three compact dashboard cards */
-.producer-dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
-  align-items: stretch;
-}
-
-.producer-dashboard-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid #e2ebde;
-  border-radius: 20px;
-  background: #fffefa;
-  box-shadow: 0 8px 24px rgba(36, 69, 43, 0.07);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.dashboard-profile-button {
-  margin-top: 20px;
-  padding: 12px 22px;
-  border: 1px solid #18482f;
-  border-radius: 8px;
-  background: #fffefa;
-  color: #18482f;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.dashboard-profile-button:hover {
-  background: #dfe9d5;
-}
-
-.producer-dashboard-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 16px 36px rgba(36, 69, 43, 0.12);
-}
-
-/* Photograph container and smooth SVG wave */
-.producer-card-image-wrap {
-  position: relative;
-  height: 200px;
-  flex-shrink: 0;
-  overflow: hidden;
-  background: #e5eedf;
-}
-
-.producer-card-image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.4s ease;
-}
-
-.producer-dashboard-card:hover .producer-card-image {
-  transform: scale(1.05);
-}
-
-/* White wave with a soft green curved edge */
-
-
-.producer-card-image-wrap::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  bottom: -1px;
-  width: 100%;
-  height: 62px;
-  pointer-events: none;
-
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 80' preserveAspectRatio='none'%3E%3Cpath d='M0 28 C95 -8 175 8 245 35 S345 70 400 68 L400 80 L0 80 Z' fill='%23fffefa'/%3E%3Cpath d='M0 28 C95 -8 175 8 245 35 S345 70 400 68' fill='none' stroke='%23b8d69d' stroke-width='7'/%3E%3C/svg%3E");
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-}
-
-/* Remove the old polygon layers */
-
-.producer-card-content::before,
-.producer-card-content::after {
-  content: none;
-}
-
-/* Text is kept compact; no overlapping pseudo-elements here. */
-.producer-card-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  margin: 0;
-  padding: 0 20px 12px;
-  background: #fffefa;
-}
-
-.producer-card-number {
-  display: none;
-}
-
-.producer-card-content h3 {
-  margin: 0 0 6px;
-  color: #173e26;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 23px;
-  font-weight: 700;
-  line-height: 1.15;
-  letter-spacing: -0.5px;
-}
-
-.producer-card-content p {
-  margin: 0 0 10px;
-  color: #43584a;
-  font-size: 13px;
-  line-height: 1.4;
-}
-
-.producer-card-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-start;
-  gap: 10px;
-  margin-top: auto;
-  padding: 8px 14px;
-  border-radius: 8px;
-  background: #287a35;
-  color: #fff;
-  font-size: 12px;
-  font-weight: 700;
-  box-shadow: 0 3px 8px rgba(27, 94, 43, 0.12);
-}
-
-/* Producer dashboard — editorial closing banner (CSS only) */
-.producer-bottom-banner {
-  position: relative;
-  display: grid;
-  grid-template-columns: 1.35fr 0.65fr;
-  align-items: end;
-  gap: 36px;
-  margin-top: 28px;
-  padding: 30px 38px;
-  overflow: hidden;
-  border: none;
-  border-radius: 20px;
-  background: #e5edda;
-}
-
-.producer-bottom-banner::before {
-  content: '';
-  position: absolute;
-  top: -110px;
-  right: -80px;
-  width: 340px;
-  height: 340px;
-  border: 1px solid rgba(43, 84, 49, 0.15);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.producer-bottom-banner::after {
-  content: '';
-  position: absolute;
-  top: -70px;
-  right: -40px;
-  width: 260px;
-  height: 260px;
-  border: 1px solid rgba(43, 84, 49, 0.12);
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.producer-bottom-banner-heading,
-.producer-banner-message {
-  position: relative;
-  z-index: 1;
-}
-
-.producer-banner-small {
-  display: block;
-  margin-bottom: 14px;
-  color: #557358;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 2px;
-}
-
-.producer-bottom-banner h2 {
-  max-width: none;
-  margin: 0;
-  color: #234a30;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(30px, 3.6vw, 46px);
-  font-weight: 700;
-  line-height: 1.06;
-  letter-spacing: -1.8px;
-}
-
-.producer-bottom-banner h2 em {
-  color: #5a8656;
-  font-weight: 400;
-}
-
-.producer-bottom-banner h2 span {
-  display: block;
-}
-
-.producer-banner-message {
-  padding-bottom: 5px;
-}
-
-.producer-bottom-banner p {
-  max-width: 300px;
-  margin: 0;
-  color: #425b46;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 16px;
-  font-weight: 400;
-  line-height: 1.6;
-  letter-spacing: -0.2px;
-}
-
-/* Wider authentication card for logged-in producers only */
-.auth-card.auth-card--producer {
-  max-width: 1200px;
-  padding: 36px;
-}
-
-@media (max-width: 950px) {
-  .producer-dashboard-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-}
-
-@media (max-width: 650px) {
-  .auth-card.auth-card--producer {
-    padding: 20px;
-  }
-
-  .producer-hero {
-    min-height: 200px;
-    padding: 24px;
-    border-radius: 18px;
-  }
-
-  
-
-
-
-
-
-
-  .producer-hero h1 {
-    font-size: 28px;
-  }
-
-  .producer-section-intro {
-    margin: 34px 0 20px;
-  }
-
-  .producer-dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: 18px;
-  }
-
-  .producer-card-image-wrap {
-    height: 190px;
-  }
-
-  .producer-bottom-banner {
-    grid-template-columns: 1fr;
-    align-items: start;
-    gap: 24px;
-    padding: 32px 26px;
-    margin-top: 26px;
-  }
-
-  .producer-bottom-banner h2 {
-    font-size: clamp(30px, 8vw, 42px);
-  }
-
-  .producer-banner-small {
-    margin-bottom: 16px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .producer-dashboard-card,
-  .producer-card-image {
-    transition: none;
-  }
-
-  .producer-dashboard-card:hover,
-  .producer-dashboard-card:hover .producer-card-image {
-    transform: none;
   }
 }
 
@@ -1062,8 +649,6 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   color: #93a295;
 }
 
-/* Focus effect */
-
 .add-product-field input:focus,
 .add-product-field select:focus,
 .add-product-field textarea:focus {
@@ -1120,15 +705,11 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
    RESPONSIVE DESIGN
    ========================================== */
 
-/* Tablet */
-
 @media (max-width: 950px) {
   .my-products-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
-/* Mobile */
 
 @media (max-width: 650px) {
   .my-products-page {
@@ -1182,7 +763,9 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     width: 100%;
   }
 }
-/* Edit Product button inside product cards */
+
+/* Edit Product button */
+
 .my-products-edit-button {
   display: inline-flex;
   align-items: center;
@@ -1205,6 +788,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 .my-products-edit-button:hover {
   background-color: #1e6029;
 }
+
 .my-products-delete-button {
   display: inline-block;
   margin-top: 12px;
@@ -1230,7 +814,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
 }
 
 /* ==========================================
-   REKOLTA PRODUCT DETAILS 
+   REKOLTA PRODUCT DETAILS
    ========================================== */
 
 .rk-detail-page {
@@ -1301,7 +885,8 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   min-width: 0;
 }
 
-/* Reference design: a thin sage ribbon following the hero's curved edge. */
+/* Product hero */
+
 .rk-detail-hero {
   position: relative;
   isolation: isolate;
@@ -1313,7 +898,6 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   border-radius: 28px 150px 0 28px;
 }
 
-/* The foreground dark shape leaves a narrow, continuous sage arc. */
 .rk-detail-hero::before {
   content: "";
   position: absolute;
@@ -1324,7 +908,6 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   pointer-events: none;
 }
 
-/* No cream wave or circular green blob. */
 .rk-detail-hero::after {
   content: none;
 }
@@ -1363,7 +946,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   line-height: 1.6;
 }
 
-/* Product content joins the curved hero */
+/* Product content */
 
 .rk-detail-body {
   position: relative;
@@ -1583,7 +1166,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   background: #d7e8c9;
 }
 
-/* Producer card with real landscape photo */
+/* Producer information card */
 
 .rk-detail-producer {
   min-width: 0;
@@ -1603,10 +1186,6 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   background-repeat: no-repeat;
 }
 
-/* A single smooth transition from photo to cream */
-
-
-/* Farm image — smooth asymmetric cream wave */
 .rk-detail-producer-landscape::after {
   content: "";
   position: absolute;
@@ -1619,8 +1198,6 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   clip-path: path("M 0 22 C 90 -12, 170 14, 245 32 C 310 49, 365 38, 440 10 L 440 60 L 0 60 Z");
   pointer-events: none;
 }
-
-
 
 .rk-detail-producer-content {
   padding: 10px 24px 38px;
@@ -1795,7 +1372,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   }
 }
 
-/* Product Details — larger, more readable typography */
+/* Product Details typography */
 
 .rk-detail-back {
   font-size: 16px;
@@ -1857,16 +1434,14 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   }
 }
 
-/* Product Details — final layout refinements */
+/* Product Details layout refinements */
 
-/* Align the product and producer sections */
 .rk-detail-layout {
   grid-template-columns: minmax(0, 2.1fr) minmax(280px, 0.9fr);
   align-items: start;
   gap: 26px;
 }
 
-/* Make the Fresh Peppers banner thinner */
 .rk-detail-hero {
   min-height: 155px;
 }
@@ -1875,13 +1450,11 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   padding: 20px 40px 24px;
 }
 
-/* Keep the product content aligned with the producer card */
 .rk-detail-body {
   margin-top: 0;
   padding-top: 24px;
 }
 
-/* Increase product information typography */
 .rk-detail-stat span {
   font-size: 17px;
 }
@@ -1902,7 +1475,6 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   font-size: 15px;
 }
 
-/* Preserve responsive layout */
 @media (max-width: 1050px) {
   .rk-detail-layout {
     grid-template-columns: minmax(0, 1fr) 280px;
@@ -1938,24 +1510,36 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
     font-size: 14px;
   }
 }
-/* Rekolta — Product Details refinement. Add at the END of App.css */
+
+/* Producer card refinements */
+
 .rk-detail-producer {
   background: #e6eedc;
   overflow: hidden;
 }
+
 .rk-detail-producer-content {
   background: #e6eedc;
   color: #16432e;
   min-height: 320px;
 }
+
 .rk-detail-producer-content h2,
 .rk-detail-producer-content h3 {
   color: #16432e;
 }
+
 .rk-detail-producer-content h2 {
   border-bottom-color: #bed3a9;
 }
-.rk-detail-location { color: #345b42; }
+
+.rk-detail-location {
+  color: #345b42;
+}
+
+/* ==========================================
+   PURCHASE REQUEST PANEL
+   ========================================== */
 
 .rk-order-panel {
   display: grid;
@@ -1968,7 +1552,11 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   background: #e6eedc;
   color: #16432e;
 }
-.rk-order-intro { min-width: 0; }
+
+.rk-order-intro {
+  min-width: 0;
+}
+
 .rk-order-intro h2 {
   margin: 0 0 10px;
   color: #16432e;
@@ -1976,6 +1564,7 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   font-size: clamp(27px, 2.4vw, 37px);
   line-height: 1.14;
 }
+
 .rk-order-intro p {
   margin: 0;
   max-width: 440px;
@@ -1983,17 +1572,25 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   font-size: 16px;
   line-height: 1.55;
 }
+
 .rk-order-controls {
   min-width: 0;
   border-left: 1px solid #b9d09e;
   padding-left: 30px;
 }
-.rk-order-controls form { display: flex; flex-direction: column; gap: 10px; }
+
+.rk-order-controls form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .rk-order-controls label {
   color: #16432e;
   font-size: 15px;
   font-weight: 700;
 }
+
 .rk-order-controls input {
   box-sizing: border-box;
   width: 100%;
@@ -2008,11 +1605,16 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   outline: none;
   transition: border-color .2s, box-shadow .2s;
 }
+
 .rk-order-controls input:focus {
   border-color: #236345;
-  box-shadow: 0 0 0 3px rgba(35,99,69,.13);
+  box-shadow: 0 0 0 3px rgba(35, 99, 69, .13);
 }
-.rk-order-controls input::placeholder { color: #889588; }
+
+.rk-order-controls input::placeholder {
+  color: #889588;
+}
+
 .rk-order-controls button {
   min-height: 49px;
   width: 100%;
@@ -2027,14 +1629,32 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   cursor: pointer;
   transition: background .2s, transform .2s;
 }
+
 .rk-order-controls button:hover:not(:disabled) {
   background: #236747;
   transform: translateY(-1px);
 }
-.rk-order-controls button:disabled { opacity: .65; cursor: wait; }
-.rk-order-feedback { margin: 12px 0 0; font-size: 14px; line-height: 1.45; }
-.rk-order-error { color: #a22c2c; }
-.rk-order-success { color: #195c37; font-weight: 600; }
+
+.rk-order-controls button:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+
+.rk-order-feedback {
+  margin: 12px 0 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.rk-order-error {
+  color: #a22c2c;
+}
+
+.rk-order-success {
+  color: #195c37;
+  font-weight: 600;
+}
+
 .rk-order-guest-note {
   margin: 20px 0 0;
   padding: 20px 24px;
@@ -2042,288 +1662,17 @@ background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/s
   background: #e6eedc;
   color: #345b42;
 }
+
 @media (max-width: 760px) {
-  .rk-order-panel { grid-template-columns: 1fr; gap: 20px; padding: 24px; }
-  .rk-order-controls { border-left: 0; border-top: 1px solid #b9d09e; padding: 20px 0 0; }
-}
-
-/* RESTAURANT DASHBOARD */
-
-.restaurant-dashboard-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.85fr);
-  align-items: center;
-  gap: 28px;
-  margin: 28px 0 32px;
-}
-
-/* Recent requests */
-
-.restaurant-requests-card {
-  overflow: hidden;
-  border: 2px solid #315f27;
-  border-radius: 22px;
-  background: #eef4e6;
-}
-
-.restaurant-requests-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 19px 24px;
-  background: #174b2d;
-  color: white;
-}
-
-.restaurant-requests-header h3 {
-  margin: 0;
-  color: white;
-  font-family: Georgia, serif;
-  font-size: clamp(21px, 2vw, 29px);
-}
-
-.restaurant-view-all {
-  border: 0;
-  background: transparent;
-  color: white;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.restaurant-view-all:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.restaurant-requests-body {
-  padding: 8px 20px;
-}
-
-.restaurant-request + .restaurant-request {
-  border-top: 1px solid #8ba47b;
-}
-
-.restaurant-request-main {
-  display: grid;
-  grid-template-columns: minmax(135px, 2fr) 0.7fr 0.8fr 1fr 20px;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 12px 0;
-  border: 0;
-  background: transparent;
-  color: #163e28;
-  text-align: left;
-  cursor: pointer;
-}
-
-.restaurant-request-product {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  min-width: 0;
-}
-
-.restaurant-request-product img {
-  width: 55px;
-  height: 55px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-.restaurant-request-product strong,
-.restaurant-request-product span {
-  display: block;
-}
-
-.restaurant-request-product strong {
-  font-size: 16px;
-}
-
-.restaurant-request-product span {
-  margin-top: 3px;
-  font-size: 13px;
-}
-
-.restaurant-request-chevron {
-  font-size: 20px;
-  text-align: right;
-}
-
-.restaurant-status {
-  display: inline-block;
-  justify-self: start;
-  padding: 7px 13px;
-  border-radius: 24px;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.restaurant-status-submitted {
-  background: #ffeab0;
-  color: #996000;
-}
-
-.restaurant-status-accepted {
-  background: #cde7be;
-  color: #184e2d;
-}
-
-.restaurant-status-rejected,
-.restaurant-status-cancelled {
-  background: #f8d1cc;
-  color: #a52d24;
-}
-
-.restaurant-request-details {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 0 16px;
-  font-size: 13px;
-}
-
-.restaurant-cancel-button {
-  padding: 8px 14px;
-  border: 1px solid #a52d24;
-  border-radius: 20px;
-  background: transparent;
-  color: #a52d24;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.restaurant-requests-empty {
-  padding: 32px 12px;
-  text-align: center;
-  color: #31563d;
-}
-
-.restaurant-requests-empty button {
-  padding: 10px 18px;
-  border: 0;
-  border-radius: 20px;
-  background: #174b2d;
-  color: white;
-  cursor: pointer;
-}
-
-/* White plate with two dark-green outlines */
-
-.restaurant-plate-area {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.restaurant-plate {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: min(100%, 350px);
-  aspect-ratio: 1;
-  padding: 12px;
-  border: 2px solid #153d25;
-  border-radius: 50%;
-  background: #fff;
-}
-
-.restaurant-plate-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  width: 100%;
-  height: 100%;
-  padding: 22px;
-  border: 2px solid #153d25;
-  border-radius: 50%;
-  text-align: center;
-}
-
-.restaurant-plate-inner h3 {
-  margin: 0 0 4px;
-  color: #153d25;
-  font-family: Georgia, serif;
-  font-size: clamp(25px, 2.5vw, 36px);
-  line-height: 1.05;
-}
-
-.restaurant-plate-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  width: 100%;
-  min-height: 46px;
-  padding: 10px 12px;
-  border: 0;
-  border-radius: 40px;
-  font-weight: 700;
-  font-size: 14px;
-  cursor: pointer;
-  transition: transform 0.2s, background 0.2s;
-}
-
-.restaurant-plate-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-}
-
-.restaurant-plate-button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.restaurant-plate-primary {
-  background: #28652e;
-  color: white;
-}
-
-.restaurant-plate-secondary {
-  background: #e1edda;
-  color: #153d25;
-}
-
-.restaurant-plate-secondary > span:first-child {
-  font-size: 25px;
-  line-height: 1;
-}
-
-/* Responsive */
-
-@media (max-width: 900px) {
-  .restaurant-dashboard-content {
+  .rk-order-panel {
     grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 24px;
   }
 
-  .restaurant-plate {
-    width: min(100%, 320px);
-  }
-}
-
-@media (max-width: 600px) {
-  .restaurant-requests-header {
-    flex-wrap: wrap;
-  }
-
-  .restaurant-request-main {
-    grid-template-columns: 1.5fr 0.7fr 0.9fr;
-    row-gap: 12px;
-  }
-
-  .restaurant-request-main .restaurant-status {
-    grid-column: 1 / 3;
-  }
-
-  .restaurant-request-chevron {
-    grid-column: 3;
-  }
-
-  .restaurant-request-details {
-    flex-wrap: wrap;
+  .rk-order-controls {
+    border-left: 0;
+    border-top: 1px solid #b9d09e;
+    padding: 20px 0 0;
   }
 }

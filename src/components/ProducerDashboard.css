@@ -1,0 +1,172 @@
+/* Business Overview */
+.producer-business-overview {
+  margin-top: 24px;
+  padding: 20px 28px;
+  background: #e5edda;
+  border: 1px solid #d2dfc5;
+  border-radius: 18px;
+}
+
+.producer-business-overview h2 {
+  margin: 0 0 18px;
+  font-family: Georgia, serif;
+  font-size: 24px;
+  color: #18482f;
+}
+
+.producer-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.producer-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 16px;
+  text-align: center;
+}
+
+.producer-stat + .producer-stat {
+  border-left: 1px solid #b7c9ac;
+}
+
+.producer-stat strong {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #18482f;
+}
+
+.producer-stat span {
+  font-size: 15px;
+  color: #344f3c;
+}
+
+.producer-business-overview p {
+  margin: 0;
+  font-size: 15px;
+  color: #344f3c;
+}
+
+/* Dashboard cards */
+.producer-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+.producer-dashboard-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #e2ebde;
+  border-radius: 20px;
+  background: #fffefa;
+  box-shadow: 0 8px 24px rgba(36, 69, 43, 0.07);
+}
+
+/* Card images */
+.producer-card-image-wrap {
+  position: relative;
+  height: 260px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #e5eedf;
+}
+
+.producer-card-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Curved image transition */
+.producer-card-image-wrap::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  width: 100%;
+  height: 62px;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 80' preserveAspectRatio='none'%3E%3Cpath d='M0 28 C95 -8 175 8 245 35 S345 70 400 68 L400 80 L0 80 Z' fill='%23fffefa'/%3E%3Cpath d='M0 28 C95 -8 175 8 245 35 S345 70 400 68' fill='none' stroke='%23b8d69d' stroke-width='7'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.producer-card-content::before,
+.producer-card-content::after {
+  content: none;
+}
+
+/* Card content */
+.producer-card-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 0 24px 22px;
+  background: #fffefa;
+}
+
+.producer-card-number {
+  display: none;
+}
+
+.producer-card-content h3 {
+  margin: 0 0 6px;
+  color: #173e26;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 27px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.5px;
+}
+
+.producer-card-content p {
+  margin: 0 0 18px;
+  line-height: 1.5;
+  color: #43584a;
+  font-size: 18px;
+}
+
+/* Card action buttons */
+.producer-card-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  align-self: flex-start;
+  gap: 16px;
+  min-width: 190px;
+  margin-top: auto;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  background: #287a35;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(27, 94, 43, 0.12);
+}
+
+/* Responsive design */
+@media (max-width: 650px) {
+  .producer-dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .producer-card-image-wrap {
+    height: 190px;
+  }
+}
