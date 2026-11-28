@@ -704,11 +704,13 @@ export default function Products({
                                 </div>
 
                                 <div className="rk-market-card-actions">
-                                  <ReportListing
-                                    productId={product.id}
-                                    productName={product.name}
-                                    isRestaurant={isRestaurant}
-                                  />
+                                 {isRestaurant && (
+                                 <ReportListing
+                                  productId={product.id}
+                                  productName={product.name}
+                                   isRestaurant={isRestaurant}
+                                   />
+                                  )}
 
                                   <button
                                     type="button"
