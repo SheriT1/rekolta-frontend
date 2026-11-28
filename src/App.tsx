@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import Home from './components/Home'
 import Navbar from './components/Navbar'
@@ -31,6 +30,8 @@ type AuthUser = {
   role: 'PRODUCER' | 'RESTAURANT' | 'ADMIN'
 }
 
+type OrderFilter = 'all' | 'SUBMITTED' | 'COMPLETED'
+
 const API_URL = `http://${window.location.hostname}:3000`
 
 function App() {
@@ -40,6 +41,8 @@ function App() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const [logoutError, setLogoutError] = useState('')
+
+  const [orderFilter, setOrderFilter] = useState<OrderFilter>('all')
 
   useEffect(() => {
     const controller = new AbortController()
@@ -85,6 +88,7 @@ function App() {
       }
 
       setCurrentUser(null)
+      setOrderFilter('all')
       setPage('auth')
     } catch (error) {
       setLogoutError(
@@ -109,13 +113,14 @@ function App() {
   }
 
   const handleManageProducts = () => {
-    if (currentUser?.role === 'PRODUCER') {
-      setPage('my-products')
-    }
+  if (currentUser?.role === 'PRODUCER') {
+    setPage('my-products')
   }
+}
 
-  const handleViewIncomingOrders = () => {
+  const handleViewIncomingOrders = (filter: OrderFilter = 'all') => {
     if (currentUser?.role === 'PRODUCER') {
+      setOrderFilter(filter)
       setPage('incoming-orders')
     }
   }
@@ -194,10 +199,12 @@ function App() {
           currentUser={currentUser}
           onLogin={setCurrentUser}
           onEditProfile={() => {
-           if (currentUser?.role === 'PRODUCER' ||
-          currentUser?.role === 'RESTAURANT') {
-          setPage('edit-profile')
-           }
+            if (
+              currentUser?.role === 'PRODUCER' ||
+              currentUser?.role === 'RESTAURANT'
+            ) {
+              setPage('edit-profile')
+            }
           }}
           onManageProducts={handleManageProducts}
           onBrowseProducts={handleBrowseProducts}
@@ -216,14 +223,14 @@ function App() {
       )}
 
       {/* Profile Management */}
-{page === 'edit-profile' &&
-  (currentUser?.role === 'PRODUCER' ||
-    currentUser?.role === 'RESTAURANT') && (
-    <EditProfile
-      onBack={() => setPage('dashboard')}
-      onSaved={setCurrentUser}
-    />
-  )}
+      {page === 'edit-profile' &&
+        (currentUser?.role === 'PRODUCER' ||
+          currentUser?.role === 'RESTAURANT') && (
+          <EditProfile
+            onBack={() => setPage('dashboard')}
+            onSaved={setCurrentUser}
+          />
+        )}
 
       {/* Producer: My Products */}
       {page === 'my-products' &&
@@ -246,6 +253,7 @@ function App() {
       {page === 'incoming-orders' &&
         currentUser?.role === 'PRODUCER' && (
           <IncomingOrders
+            initialFilter={orderFilter}
             onBack={() => setPage('dashboard')}
           />
         )}

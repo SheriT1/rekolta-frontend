@@ -27,6 +27,19 @@
   gap: 6px;
   padding: 4px 16px;
   text-align: center;
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.producer-stat:hover {
+  background-color: #d8e5cd;
+}
+
+.producer-stat:focus-visible {
+  outline: 2px solid #287a35;
+  outline-offset: -2px;
 }
 
 .producer-stat + .producer-stat {

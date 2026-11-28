@@ -22,7 +22,7 @@ type AuthProps = {
   onManageProducts: () => void
   onBrowseProducts: () => void
   onViewAllRequests: () => void
-  onViewIncomingOrders: () => void
+  onViewIncomingOrders: (filter?: 'all' | 'SUBMITTED' | 'COMPLETED') => void
   onViewFavorites: () => void
   onEditProfile: () => void
 }

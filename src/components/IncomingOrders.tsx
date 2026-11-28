@@ -57,6 +57,7 @@ type IncomingOrder = {
 
 type IncomingOrdersProps = {
   onBack: () => void
+  initialFilter?: 'all' | 'SUBMITTED' | 'COMPLETED'
 }
 
 type OrderFilter = 'ALL' | OrderStatus
@@ -74,8 +75,9 @@ const filters: { key: OrderFilter; label: string }[] = [
   { key: 'REJECTED', label: 'Declined' },
 ]
 
-export default function IncomingOrders({
+ export default function IncomingOrders({
   onBack,
+  initialFilter = 'all',
 }: IncomingOrdersProps) {
   const [orders, setOrders] = useState<IncomingOrder[]>([])
   const [loading, setLoading] = useState(true)
@@ -83,7 +85,9 @@ export default function IncomingOrders({
   const [success, setSuccess] = useState('')
   const [actionError, setActionError] = useState('')
   const [processingId, setProcessingId] = useState<string | null>(null)
-  const [filter, setFilter] = useState<OrderFilter>('ALL')
+  const [filter, setFilter] = useState<OrderFilter>(
+  initialFilter === 'all' ? 'ALL' : initialFilter
+)
   const [search, setSearch] = useState('')
 
 
